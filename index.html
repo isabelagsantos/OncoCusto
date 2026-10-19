@@ -137,6 +137,9 @@ input:disabled,select:disabled{opacity:.5}
 .auto{background:var(--accent-soft);border-radius:8px;padding:9px 11px;font-size:14px}
 .auto small{display:block;color:var(--muted);font-size:12px}
 .hint{display:flex;gap:8px;background:var(--warn-soft);border-radius:8px;padding:7px 10px;font-size:12px}
+.manut{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:baseline;background:var(--warn-soft);color:var(--text);border-bottom:1px solid var(--warn-dot);padding:10px 16px;font-size:13px}
+.manut b{color:var(--warn)}
+.manut.hidden{display:none}
 .info{display:flex;gap:8px;background:var(--accent-soft);border-radius:8px;padding:9px 11px;font-size:13px}
 .seg{display:inline-flex;border:1px solid var(--line);border-radius:9px;overflow:hidden;flex-wrap:wrap}
 .seg button{border:0;background:transparent;padding:7px 12px;font-size:13px;color:var(--muted)}
@@ -172,6 +175,13 @@ input:disabled,select:disabled{opacity:.5}
 .kv small{display:block;color:var(--muted);font-size:11px}
 .kv b{font-variant-numeric:tabular-nums;font-weight:600}
 details.compat{margin-top:10px}
+.guia{margin-top:10px;border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:var(--surface-2)}
+.guia summary{cursor:pointer;color:var(--accent-ink);font-weight:500}
+.guia ol{margin:8px 0 0 18px;padding:0}.guia li{margin:4px 0}
+.guia .cods{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.guia .cods button{font-family:ui-monospace,monospace}
+.opm-status{margin-top:8px;font-size:13px}
+.opm-status.ok{color:var(--green)}
 details.compat summary{cursor:pointer;color:var(--accent-ink);font-weight:500}
 details.compat .table-wrap{max-height:260px;overflow:auto;margin-top:8px;border:1px solid var(--line);border-radius:8px}
 
@@ -283,6 +293,12 @@ footer{max-width:1180px;margin:0 auto;padding:18px 16px 32px;color:var(--muted);
   </div>
 </header>
 
+<!-- AVISO DE REVISÃO: aparece sozinho quando MANUTENCAO.ativo = true (no script, procure "MANUTENCAO") -->
+<div class="manut hidden" id="manut" role="status">
+  <b>Site em revisão</b>
+  <span id="manut-txt">O OncoCusto está passando por manutenção ou recebendo uma nova versão por até 5 dias úteis. Você pode continuar registrando normalmente; ao terminar, confira os avisos e a versão do site na aba Parâmetros da planilha.</span>
+</div>
+
 <div class="shell">
   <nav class="steps" aria-label="Etapas">
     <ol>
@@ -299,6 +315,10 @@ footer{max-width:1180px;margin:0 auto;padding:18px 16px 32px;color:var(--muted);
     <ol>
       <li><a href="#revisao" data-v="revisao"><span class="num">5</span>Revisão<span class="badge" id="nav-badge"></span></a></li>
       <li><a href="#exportar" data-v="exportar"><span class="num">6</span>Exportar</a></li>
+    </ol>
+    <h4>Ajuda</h4>
+    <ol>
+      <li><a href="#sigtap" data-v="sigtap"><span class="num">?</span>Conferir no SIGTAP</a></li>
     </ol>
   </nav>
 
@@ -341,6 +361,13 @@ footer{max-width:1180px;margin:0 auto;padding:18px 16px 32px;color:var(--muted);
           <tbody id="bases-status"><tr><td colspan="4" class="empty-row">Carregando bases…</td></tr></tbody>
         </table></div>
       </div>
+    </section>
+
+    <!-- ================= CONFERIR NO SIGTAP ================= -->
+    <section class="view" id="v-sigtap">
+      <button class="back" data-v="inicio">← Voltar ao início</button>
+      <div class="page-head"><div><div class="eyebrow">Ajuda</div><h1>Como conferir a compatibilidade no SIGTAP</h1><p>Use quando a base do site não trouxer o par procedimento principal × OPM, ou trouxer a quantidade 0 ou vazia.</p></div></div>
+      <div class="panel"><div class="body" id="sigtap-pagina"></div></div>
     </section>
 
     <!-- ================= ABRIR PLANILHA ================= -->
@@ -444,6 +471,7 @@ footer{max-width:1180px;margin:0 auto;padding:18px 16px 32px;color:var(--muted);
           <div class="param"><div><b>Base do BPS</b><span>Arquivo de medianas usado no projeto</span></div><select data-k="base_bps" data-bps></select></div>
           <div class="param"><div><b>Data de referência do BPS</b><span>Janela de 12 meses antes desta data</span></div><input type="date" data-k="bps_ref"></div>
           <div class="param"><div><b>Mínimo de compras por nível</b><span>Município, UF, região, Brasil</span></div><input type="number" data-k="min_compras" value="3" min="1"></div>
+          <div class="param"><div><b>Plano B: aceitar 1 compra</b><span>Quando nenhum nível atinge o mínimo, usa o nível mais próximo com ao menos 1 compra e marca “base fraca”</span></div><label class="check"><input type="checkbox" data-k="plano_b" checked>Usar plano B</label></div>
           <div class="param hl">
             <div><b>Habilitação Oncologia Cirúrgica <span class="req">*</span> <button type="button" class="qm" aria-label="O que é o CNES">?</button></b><span>17.17 / 17.18 · conferência obrigatória no CNES</span></div>
             <div>
@@ -458,7 +486,8 @@ footer{max-width:1180px;margin:0 auto;padding:18px 16px 32px;color:var(--muted);
           <div class="param"><div><b>Fator estimulador de colônias</b></div><div class="seg" data-k="fec"><button class="on">Uma por mês</button><button>Por aplicação</button></div></div>
           <div class="param"><div><b>Registros fora da janela da AIH</b></div><div class="seg" data-k="fora_aih"><button class="on">Ambulatoriais</button><button>AIH mais próxima</button></div></div>
           <div class="param"><div><b>Permanência a maior</b></div><div class="seg" data-k="permanencia"><button class="on">Informada</button><button>Fórmula do SIH</button></div></div>
-          <div class="param"><div><b>Fator de correção do SIGTAP</b><span>Sai em coluna separada</span></div><input type="text" data-k="fator" placeholder="Nenhum"></div>
+          <div class="param"><div><b>Fator de correção do SIGTAP <button type="button" class="qm" aria-label="Sobre o fator de correção">?</button></b><span>Só para o cenário do Resumo · padrão 2,8</span></div><input type="text" data-k="fator" placeholder="2,8">
+            <div class="tip" style="grid-column:1/-1">A Diretriz Metodológica de Avaliação Econômica (3ª ed., itens XLVI e XLVII) explica que a tabela SIGTAP traz só o repasse federal e cita um fator próximo de <b>2,8</b> para os <b>procedimentos hospitalares</b>, a partir das Contas do SUS. Ela não fixa fator para procedimentos ambulatoriais nem para medicamentos. Por isso o site multiplica por esse fator só o que foi feito em internação, numa coluna separada do Resumo (<b>total_com_fator_correcao</b>), que sai sempre. O caso-base continua com o valor da tabela. Deixe em branco para usar 2,8.</div></div>
         </div>
         <div class="form-foot"><button class="btn" data-v="inicio">Cancelar</button><button class="btn pri" id="proj-salvar">Salvar e começar o registro</button></div>
       </div>
@@ -494,13 +523,25 @@ footer{max-width:1180px;margin:0 auto;padding:18px 16px 32px;color:var(--muted);
         </div>
       </div>
 
+      <div class="panel hidden" id="proc-opm">
+        <h2>OPM: procedimento principal e quantidade <small>· grupo 07</small></h2>
+        <div class="body fields">
+          <div class="f"><label>Procedimento principal (cirurgia) <span class="req">*</span></label><select data-k="co_principal_opm" id="opm-principal"><option value="">Escolha…</option></select><span class="help">Lista as cirurgias já salvas para este prontuário. Salve a cirurgia antes do OPM.</span></div>
+          <div class="f"><label>Qtd. conferida no SIGTAP <span class="opt">(opcional)</span></label><input type="number" min="0" data-k="qtd_conferida_sigtap" id="opm-qtd-conf"><span class="help">Use quando a base trouxer o par sem quantidade (0 ou vazia) ou não trouxer o par.</span></div>
+          <div class="f full"><div class="opm-status" id="opm-status"></div><div id="opm-guia"></div></div>
+        </div>
+      </div>
+
       <div class="panel">
-        <h2>Cirurgia em AIH e radioterapia <small>· preencha quando se aplicar</small></h2>
+        <h2>AIH, APAC e radioterapia <small>· preencha quando se aplicar</small></h2>
         <div class="body fields three">
           <div class="f"><label>Nº da AIH</label><select data-k="aih" id="proc-aih"><option value="">Nenhuma</option></select></div>
           <div class="f"><label>Tipo de AIH</label><select data-k="tipo_aih"><option value="">—</option><option>Comum</option><option>Sequenciais em oncologia (04.15.02.005-0)</option><option>Cirurgias múltiplas (04.15.01.001-2)</option><option>Outras sequenciais (04.15.02.003-4)</option><option>Outro tipo…</option></select><span class="help">Lista completa a definir.</span></div>
           <div class="f"><label>Ordem na AIH</label><input type="number" data-k="ordem_aih" min="1"></div>
           <div class="f full"><div class="info">ℹ As AIH desta lista vêm da aba Internações. Cadastre lá a internação antes de vincular a cirurgia. <button class="linkbtn" data-v="internacoes">Ir para Internações</button></div></div>
+          <div class="f full"><label>Nº ou data da APAC <span class="opt">(opcional)</span> <button type="button" class="qm" aria-label="Para que serve o nº da APAC">?</button></label>
+            <div class="tip"><b>Campo opcional, mas útil.</b> A APAC de quimioterapia e hormonioterapia vale até 3 competências (inicial e continuidade); a de radioterapia é única, com validade de 3 meses e faturada uma vez ao final do tratamento (Manual de Bases Técnicas da Oncologia, 30ª ed.). Com o número (ou a data de autorização) o site agrupa os registros da mesma APAC, avisa quando ela passa de 3 competências e confere se o procedimento secundário está na mesma APAC do principal. Sem ele, o cálculo continua normal, só sem essas conferências. Use o mesmo texto em todos os registros da mesma APAC.</div>
+            <input type="text" data-k="apac" placeholder="Ex.: 3526123456789 ou 05/03/2026"></div>
           <div class="f"><label>Início do tratamento</label><input type="date" data-k="rt_inicio"></div>
           <div class="f"><label>Término do tratamento</label><input type="date" data-k="rt_fim"></div>
           <div class="f"><label>Nº de sessões</label><input type="number" data-k="rt_sessoes" placeholder="Radioterapia"></div>
@@ -562,6 +603,7 @@ footer{max-width:1180px;margin:0 auto;padding:18px 16px 32px;color:var(--muted);
     <section class="view" id="v-medicamentos" data-form="meds">
       <div class="page-head"><div><div class="eyebrow">Etapa 4 · Registro</div><h1>Medicamentos</h1><p>Retirados pelo paciente, fora de procedimentos. Quimioterapia vai em Procedimentos.</p></div></div>
       <div class="subnav" data-sub></div>
+      <div class="info" style="margin-bottom:14px">⚠ <span><b>Não registre os medicamentos dados durante a sessão de quimioterapia</b> (por exemplo, dipirona, ondansetrona, dexametasona, anti-inflamatórios, diuréticos, ranitidina, soros e eletrólitos). Eles já estão no valor da APAC de quimioterapia (Portaria SAES/MS 470/2021, art. 25; Manual de Bases Técnicas da Oncologia, p. 155–156). Também não registre aqui antineoplásicos, inclusive orais como a capecitabina: eles vão em Procedimentos, pela APAC.</span></div>
 
       <div class="panel">
         <h2>Paciente e origem</h2>
@@ -695,8 +737,15 @@ footer{max-width:1180px;margin:0 auto;padding:18px 16px 32px;color:var(--muted);
    Ao publicar uma competência ou base nova, acrescente uma linha aqui.
    A primeira de cada lista é a padrão para projetos novos.
    ===================================================================== */
+/* =====================================================================
+   AVISO DE REVISÃO
+   Para ligar: ativo: true e a data de início (AAAA-MM-DD).
+   O aviso some sozinho depois de 5 dias úteis; para desligar antes, ativo: false.
+   ===================================================================== */
+const MANUTENCAO = { ativo: false, inicio: "2026-10-20", dias_uteis: 5 };
+
 const CONFIG = {
-  versaoSite: "0.2 · teste das bases (sem regras)",
+  versaoSite: "0.4 · campo APAC, plano B do BPS, aviso de suporte e cenário do fator de correção",
   pastas: ["dados/", ""],               // procura primeiro em dados/, depois na raiz do repositório
   sigtap: {
     "10/2026": { proc: "sigtap_procedimentos_10_2026.json", compat: "sigtap_compatibilidade_10_2026.json" },
@@ -738,6 +787,8 @@ function lerLocal(){
 const compAtual = () => state.projeto?.comp_sigtap || Object.keys(CONFIG.sigtap)[0];
 const bpsAtual  = () => state.projeto?.base_bps    || Object.keys(CONFIG.bps)[0];
 const minCompras = () => Math.max(1, parseInt(state.projeto?.min_compras, 10) || 3);
+const fatorCorrecao = () => { const v = parseFloat(String(state.projeto?.fator ?? "").replace(",", ".")); return v > 0 ? v : 2.8; };
+const planoB = () => state.projeto?.plano_b !== false && state.projeto?.plano_b !== "false";
 
 /* =====================================================================
    CARREGAMENTO DAS BASES
@@ -980,6 +1031,7 @@ function renderCabecalho(){
   const b = DB.bps[bpsAtual()];
   $("#ft-bps").textContent = `BPS ${bpsAtual()}${b?.periodo ? " (" + b.periodo + ")" : ""}`;
   $("#ft-versao").textContent = `Versão do site ${CONFIG.versaoSite}`;
+  mostrarManutencao();
   $("#proc-comp-lbl").textContent = `· SIGTAP ${compAtual()}`;
   $("#med-bps-lbl").textContent = `· BPS ${bpsAtual()}`;
   const slug = norm(p?.titulo || "titulo-do-projeto").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "projeto";
@@ -1045,6 +1097,76 @@ function buscaGenerica(lista, q, codigoDe, max = 40){
 /* =====================================================================
    PROCEDIMENTOS
    ===================================================================== */
+const SIGTAP_URL = "http://sigtap.datasus.gov.br/tabela-unificada/app/sec/procedimentoCompativelConsulta.jsp";
+const ehOPM = c => !!c && String(c).startsWith("07");
+function guiaSigtap(principal, opm, aberto){
+  const cods = [principal && ["Principal", principal], opm && ["OPM", opm]].filter(Boolean);
+  return `<details class="guia"${aberto ? " open" : ""}><summary>Como conferir no SIGTAP</summary>
+    <ol>
+      <li>Abra a <a href="${SIGTAP_URL}" target="_blank" rel="noopener">consulta de compatibilidades do SIGTAP</a>.</li>
+      <li>Caminho: <b>Tabela Unificada → Compatibilidades</b>, competência ${esc(compAtual())}.</li>
+      <li>Escolha o <b>Grupo</b> do procedimento principal e o <b>Subgrupo</b>; para OPM, o grupo 07 (subgrupo 01 ou 02) aparece como compatível.</li>
+      <li>Selecione o procedimento principal, localize o OPM na lista e leia a <b>Qtd</b> do par.</li>
+      <li>Informe a quantidade no campo "Qtd. conferida no SIGTAP".</li>
+    </ol>
+    ${cods.length ? `<div class="cods">${cods.map(([r, c]) => `<button type="button" class="btn sm" data-copy="${esc(fmtCod(c))}">Copiar ${r}: ${esc(fmtCod(c))}</button>`).join("")}</div>` : ""}
+  </details>`;
+}
+function relOPM(pr, op){
+  const s = DB.sigtap[compAtual()]; if (!s?.pronto) return null;
+  const l = (s.compat.get(pr) || []).filter(r => r.co_compativel === op && /special/i.test(r.tipo));
+  return l.length ? l.reduce((a, b) => ((b.qtd || 0) > (a.qtd || 0) ? b : a)) : undefined;   // undefined = par não consta
+}
+/* Valida OPM: devolve { aviso, nota } */
+function validarOPM(e){
+  if (!ehOPM(e.co_procedimento)) return null;
+  const pr = e.co_principal_opm;
+  if (!pr) return { aviso: "OPM sem procedimento principal vinculado" };
+  const r = relOPM(pr, e.co_procedimento);
+  const conf = e.qtd_conferida_sigtap === "" || e.qtd_conferida_sigtap == null ? null : Number(e.qtd_conferida_sigtap);
+  const q = Number(e.quantidade) || 1;
+  const par = `${fmtCod(pr)} × ${fmtCod(e.co_procedimento)}`;
+  if (conf != null && !isNaN(conf)) {
+    const nota = `Qtd conferida manualmente no SIGTAP (${par}): ${conf}`;
+    return q > conf ? { aviso: `Quantidade ${q} acima da conferida no SIGTAP (${conf})`, nota } : { nota };
+  }
+  if (r === undefined) return { aviso: `Par ${par} não consta na base de compatibilidade: conferir no SIGTAP` };
+  if (r === null) return null;
+  if (!r.qtd) return { aviso: `Par ${par} com quantidade ${r.qtd === 0 ? "0" : "vazia"} na base: conferir no SIGTAP` };
+  return q > r.qtd ? { aviso: `Quantidade ${q} acima do máximo do par (${r.qtd})` } : null;
+}
+function renderOPM(){
+  const painel = $("#proc-opm");
+  if (!selProc || !ehOPM(selProc.co_procedimento)) { painel.classList.add("hidden"); return; }
+  painel.classList.remove("hidden");
+  const v = $("#v-procedimentos");
+  const pront = $("[data-k=prontuario]", v).value.trim();
+  const sel = $("#opm-principal"), atual = sel.value;
+  const cands = state.procs.filter(e => e.prontuario === pront && !ehOPM(e.co_procedimento));
+  const unicos = [...new Map(cands.map(e => [e.co_procedimento, e])).values()];
+  sel.innerHTML = `<option value="">Escolha…</option>` + unicos.map(e => `<option value="${esc(e.co_procedimento)}">${esc(fmtCod(e.co_procedimento))} · ${esc((e.no_procedimento || "").slice(0, 60))}</option>`).join("");
+  sel.value = unicos.some(e => e.co_procedimento === atual) ? atual : "";
+  const st = $("#opm-status");
+  const fake = { co_procedimento: selProc.co_procedimento, co_principal_opm: sel.value, qtd_conferida_sigtap: $("#opm-qtd-conf").value, quantidade: $("[data-k=quantidade]", v).value };
+  const res = validarOPM(fake);
+  st.className = "opm-status" + (res && !res.aviso ? " ok" : "");
+  st.innerHTML = !sel.value ? "Escolha o procedimento principal para validar a quantidade." : res?.aviso ? "⚠ " + esc(res.aviso) : res?.nota ? "✓ " + esc(res.nota) : "✓ Par e quantidade conferem com a base.";
+  $("#opm-guia").innerHTML = guiaSigtap(sel.value, selProc.co_procedimento, !!res?.aviso);
+}
+$("#v-procedimentos").addEventListener("input", e => { if (e.target.matches("[data-k=prontuario],[data-k=quantidade],#opm-qtd-conf")) renderOPM(); });
+$("#v-procedimentos").addEventListener("change", e => { if (e.target.matches("#opm-principal,[data-k=prontuario]")) renderOPM(); });
+document.addEventListener("click", e => {
+  const b = e.target.closest("[data-copy]"); if (!b) return;
+  const txt = b.dataset.copy;
+  (navigator.clipboard?.writeText(txt) || Promise.reject()).then(() => toast("Código copiado."), () => toast(txt));
+});
+$("#sigtap-pagina").innerHTML = `
+  <p>O SIGTAP não permite consulta automática, por isso a conferência é manual. A base do site traz as compatibilidades "Vigentes na competência"; use esta página quando um par não estiver nela.</p>
+  ${guiaSigtap(null, null, true)}
+  <h3 style="margin-top:16px">Tipos de relatório</h3>
+  <p><b>Vigentes na competência</b>: tudo que vale naquele mês (é o que o site usa). <b>Publicados na competência</b>: só o que foi publicado naquele mês, útil para ver mudanças.</p>
+  <p class="help">O link abre o SIGTAP numa nova aba. Se o site pedir, navegue pelo menu até Compatibilidades.</p>`;
+
 let selProc = null;
 const procBusca = $("#proc-busca");
 autocomplete(procBusca,
@@ -1066,7 +1188,7 @@ function valorTabela(p, qtd){
 }
 function renderProcInfo(){
   const box = $("#proc-info");
-  if (!selProc) { box.classList.add("hidden"); box.innerHTML = ""; return; }
+  if (!selProc) { box.classList.add("hidden"); box.innerHTML = ""; renderOPM(); return; }
   const p = selProc;
   const compat = DB.sigtap[compAtual()]?.compat.get(p.co_procedimento) || [];
   const kv = [["Classificação", p.classificacao], ["Complexidade", p.complexidade], ["Modalidade", p.modalidade],
@@ -1075,6 +1197,7 @@ function renderProcInfo(){
     <div class="sel-top"><span class="mono">${fmtCod(p.co_procedimento)}</span><b>${esc(p.no_procedimento)}</b></div>
     <div class="kv">${kv.map(([k, v]) => `<div><small>${k}</small><b>${esc(v ?? "—")}</b></div>`).join("")}</div>
     ${p.vl_sa == null && p.vl_tot_hosp == null ? `<div class="hint" style="margin-top:8px">⚠ Procedimento novo nesta competência: a base ainda não traz os valores.</div>` : ""}
+    ${p.alterado_na_competencia ? `<div class="hint" style="margin-top:8px">⚠ A SIGTAP alterou este procedimento em ${compAtual()}. Os valores mostrados já são os da competência atual; confira se o que mudou foi o valor, o nome ou a complexidade.</div>` : ""}
     <details class="compat"><summary>Compatibilidades em ${compAtual()}: ${num(compat.length)} ${compat.length === 1 ? "relação" : "relações"} como principal</summary>
       ${compat.length ? `<div class="table-wrap"><table><thead><tr><th>Código</th><th>Procedimento</th><th>Tipo</th><th>Qtd.</th><th>Desde</th></tr></thead><tbody>
         ${compat.slice(0, 200).map(r => { const c = DB.sigtap[compAtual()].byCode.get(r.co_compativel);
@@ -1083,6 +1206,7 @@ function renderProcInfo(){
     </details>
   </div>`;
   box.classList.remove("hidden");
+  renderOPM();
 }
 
 /* Local do ato: dentro do período de uma internação do mesmo prontuário → Hospitalar */
@@ -1112,6 +1236,8 @@ $("#proc-salvar").addEventListener("click", () => {
   const e = ler(v);
   if (!selProc) { toast("Escolha um procedimento da lista.", true); procBusca.focus(); return; }
   if (!e.prontuario) { toast("Informe o prontuário.", true); return; }
+  if (ehOPM(selProc.co_procedimento) && !e.co_principal_opm) { toast("Escolha o procedimento principal do OPM.", true); $("#opm-principal").focus(); return; }
+  if (!ehOPM(selProc.co_procedimento)) { e.co_principal_opm = ""; e.qtd_conferida_sigtap = ""; }
   Object.assign(e, { id: uid(), usuario: state.projeto.usuario, co_procedimento: selProc.co_procedimento, criado_em: new Date().toISOString() });
   state.procs.push(e);
   recalcular(); salvarLocal(); renderTudo();
@@ -1178,7 +1304,11 @@ function precoBPS(catmat, un, uf, mun){
   tent.push(["Brasil", k("brasil", "")]);
   for (const [nome, chave] of tent){
     const r = b.idx.get(chave);
-    if (r && r.n_compras >= minCompras()) return { ...r, nivelNome: nome };
+    if (r && r.n_compras >= minCompras()) return { ...r, nivelNome: nome, fraca: false };
+  }
+  if (planoB()) for (const [nome, chave] of tent){
+    const r = b.idx.get(chave);
+    if (r && r.n_compras >= 1) return { ...r, nivelNome: nome, fraca: true };
   }
   return null;
 }
@@ -1190,7 +1320,7 @@ function atualizarPreco(){
   const qtd = Number($("#med-qtd").value) || 0;
   const r = precoBPS(selMed.co_catmat, un, uf, mun);
   box.innerHTML = r
-    ? `${brl(r.mediana, 4)} por ${esc(un.toLowerCase())} · total ${brl(r.mediana * qtd)}<small>Nível: ${r.nivelNome}${r.nivel === "municipio" ? " (" + esc(r.no_municipio) + ")" : r.nivel === "uf" ? " (" + esc(r.sg_uf) + ")" : r.nivel === "regiao" ? " (" + esc(r.regiao) + ")" : ""} · compras: ${r.n_compras} · período: ${esc(r.periodo || "—")}</small>`
+    ? `${brl(r.mediana, 4)} por ${esc(un.toLowerCase())} · total ${brl(r.mediana * qtd)}<small>Nível: ${r.nivelNome}${r.nivel === "municipio" ? " (" + esc(r.no_municipio) + ")" : r.nivel === "uf" ? " (" + esc(r.sg_uf) + ")" : r.nivel === "regiao" ? " (" + esc(r.regiao) + ")" : ""} · compras: ${r.n_compras} · período: ${esc(r.periodo || "—")}${r.fraca ? ` · <b style="color:var(--warn)">⚠ base fraca: menos de ${minCompras()} compras</b>` : ""}</small>`
     : `Sem registro de preço<small>Nenhum nível com ${minCompras()} compras ou mais para esta unidade${uf ? "" : " · escolha a UF para buscar por local"}</small>`;
 }
 $("#v-medicamentos").addEventListener("change", e => { if (e.target.matches("#med-un,#med-uf,#med-mun,#med-qtd")) atualizarPreco(); });
@@ -1223,6 +1353,35 @@ document.addEventListener("change", e => {
 /* =====================================================================
    RECÁLCULO (só valores de tabela; as regras entram depois)
    ===================================================================== */
+/* Aviso de revisão: calcula o fim somando dias úteis (seg a sex) ao início */
+function fimManutencao(inicio, n){
+  const d = new Date(inicio + "T12:00:00"); const w0 = d.getDay();
+  let k = (w0 !== 0 && w0 !== 6) ? 1 : 0;          // o dia de início conta, se for dia útil
+  while (k < n) { d.setDate(d.getDate() + 1); const w = d.getDay(); if (w !== 0 && w !== 6) k++; }
+  return d;
+}
+function mostrarManutencao(){
+  const el = $("#manut"); if (!el) return;
+  if (!MANUTENCAO.ativo || !/^\d{4}-\d{2}-\d{2}$/.test(MANUTENCAO.inicio)) { el.classList.add("hidden"); return; }
+  const ini = new Date(MANUTENCAO.inicio + "T00:00:00"), fim = fimManutencao(MANUTENCAO.inicio, MANUTENCAO.dias_uteis || 5);
+  const agora = new Date();
+  if (agora < ini || agora > new Date(fim.toDateString() + " 23:59:59")) { el.classList.add("hidden"); return; }
+  const f = d => d.toLocaleDateString("pt-BR");
+  $("#manut-txt").textContent = `O OncoCusto está em manutenção ou recebendo uma nova versão de ${f(ini)} a ${f(fim)} (${MANUTENCAO.dias_uteis || 5} dias úteis). Você pode continuar registrando normalmente; ao terminar, confira os avisos e a versão do site na aba Parâmetros da planilha.`;
+  el.classList.remove("hidden");
+}
+
+/* APAC (campo opcional): até 3 competências por APAC de quimio/hormônio; radioterapia é APAC única */
+const ehQuimioRadio = c => !!c && String(c).startsWith("0304");
+const ehQuimio = c => ehQuimioRadio(c) && !String(c).startsWith("030401");   // 03.04.01 = radioterapia
+function avisoAPAC(e){
+  const ap = String(e.apac || "").trim();
+  if (!ap || !ehQuimioRadio(e.co_procedimento) || !e.data_realizacao || !/^\d{4}-\d{2}/.test(e.data_realizacao)) return "";
+  const comps = new Set(state.procs.filter(x => x.prontuario === e.prontuario && String(x.apac || "").trim() === ap && ehQuimioRadio(x.co_procedimento) && /^\d{4}-\d{2}/.test(x.data_realizacao || "")).map(x => x.data_realizacao.slice(0, 7)));
+  const ord = [...comps].sort();
+  const pos = ord.indexOf(e.data_realizacao.slice(0, 7));
+  return pos >= 3 ? `APAC ${ap} com mais de 3 competências (${ord.length}): conferir se é nova APAC` : "";
+}
 function recalcular(){
   const s = DB.sigtap[compAtual()];
   state.procs.forEach(e => {
@@ -1237,7 +1396,13 @@ function recalcular(){
     e.valor_tabela = p ? valorTabela(p, e.quantidade) : null;
     e.aviso = !s?.pronto ? "Base SIGTAP não carregada"
             : !p ? `Código não existe em ${compAtual()}`
-            : (p.vl_sa == null && p.vl_tot_hosp == null) ? "Sem valor na base" : "";
+            : (p.vl_sa == null && p.vl_tot_hosp == null) ? `Novo em ${compAtual()}: sem valor na base`
+            : p.alterado_na_competencia ? `Alterado em ${compAtual()}: conferir valor` : "";
+    const ap = avisoAPAC(e);
+    if (ap) e.aviso = e.aviso ? e.aviso + " | " + ap : ap;
+    const o = validarOPM(e);
+    e.nota_conferencia = o?.nota || "";
+    if (o?.aviso) e.aviso = e.aviso ? e.aviso + " | " + o.aviso : o.aviso;
   });
   state.meds.forEach(e => {
     const r = precoBPS(e.codigo_catmat, e.unidade, e.uf, e.municipio);
@@ -1245,10 +1410,15 @@ function recalcular(){
     e.medicamento = it?.ds_item ?? e.medicamento ?? "";
     e.base_bps = bpsAtual();
     e.nivel_preco = r?.nivelNome || ""; e.n_compras = r?.n_compras ?? ""; e.periodo_bps = r?.periodo || "";
+    e.base_fraca = r ? (r.fraca ? "Sim" : "Não") : "";
     e.valor_unitario = r?.mediana ?? null;
     const q = Number(e.quantidade) || 0;
     e.valor_total = r ? r.mediana * q : null;
-    e.aviso = !DB.bps[bpsAtual()]?.pronto ? "Base BPS não carregada" : !r ? "Sem registro de preço" : "";
+    e.aviso = !DB.bps[bpsAtual()]?.pronto ? "Base BPS não carregada" : !r ? "Sem registro de preço" : r.fraca ? `Base fraca: ${r.n_compras} ${r.n_compras == 1 ? "compra" : "compras"} (mínimo ${minCompras()})` : "";
+    if (e.data_retirada && state.procs.some(x => x.prontuario === e.prontuario && x.data_realizacao === e.data_retirada && ehQuimio(x.co_procedimento))) {
+      const a = "Mesmo dia de quimioterapia: se foi dado na sessão, não registre (já incluído na APAC)";
+      e.aviso = e.aviso ? e.aviso + " | " + a : a;
+    }
   });
   state.ints.forEach(e => {
     e.n_procedimentos = state.procs.filter(p => p.prontuario === e.prontuario && p.aih_do_periodo === e.aih).length;
@@ -1377,9 +1547,9 @@ document.addEventListener("click", e => {
    EXPORTAR .xlsx
    ===================================================================== */
 const COLS = {
-  proc: ["id","usuario","prontuario","codigo_paciente","origem_dado","data_realizacao","data_pedido","co_procedimento","no_procedimento","classificacao","quantidade","local_ato","aih_do_periodo","aih","tipo_aih","ordem_aih","rt_inicio","rt_fim","rt_sessoes","situacao","doc","observacao_usuario","competencia","vl_sa","vl_sh","vl_sp","vl_tot_hosp","valor_tabela","aviso","criado_em"],
+  proc: ["id","usuario","prontuario","codigo_paciente","origem_dado","data_realizacao","data_pedido","co_procedimento","no_procedimento","classificacao","quantidade","local_ato","aih_do_periodo","aih","tipo_aih","ordem_aih","apac","rt_inicio","rt_fim","rt_sessoes","situacao","doc","observacao_usuario","competencia","co_principal_opm","qtd_conferida_sigtap","nota_conferencia","vl_sa","vl_sh","vl_sp","vl_tot_hosp","valor_tabela","aviso","criado_em"],
   int:  ["id","usuario","prontuario","aih","tipo_aih","data_entrada","data_alta","motivo_saida","observacao_usuario","n_procedimentos","aviso","criado_em"],
-  med:  ["id","usuario","prontuario","codigo_paciente","origem_dado","data_retirada","data_receita","codigo_catmat","medicamento","unidade","quantidade","uf","municipio","situacao","doc","observacao_usuario","base_bps","nivel_preco","n_compras","periodo_bps","valor_unitario","valor_total","aviso","criado_em"]
+  med:  ["id","usuario","prontuario","codigo_paciente","origem_dado","data_retirada","data_receita","codigo_catmat","medicamento","unidade","quantidade","uf","municipio","situacao","doc","observacao_usuario","base_bps","nivel_preco","n_compras","base_fraca","periodo_bps","valor_unitario","valor_total","aviso","criado_em"]
 };
 function linhasPara(lista, cols, semPront){
   return lista.map(e => Object.fromEntries(cols.filter(c => !(semPront && c === "prontuario")).map(c => [c, Array.isArray(e[c]) ? (e[c].length ? e[c].join("; ") : "N") : (e[c] ?? "")])));
@@ -1399,11 +1569,14 @@ $("#exp-baixar").addEventListener("click", () => {
     const P = state.procs.filter(e => e.prontuario === pr), M = state.meds.filter(e => e.prontuario === pr);
     const cod = (P[0] || M[0])?.codigo_paciente || "";
     const tp = P.reduce((s, e) => s + (e.valor_tabela || 0), 0), tm = M.reduce((s, e) => s + (e.valor_total || 0), 0);
+    const th = P.filter(e => e.local_ato === "Hospitalar").reduce((s, e) => s + (e.valor_tabela || 0), 0);
+    const fc = fatorCorrecao();
     return { ...(semPront ? { paciente: cod || `Paciente ${i + 1}` } : { prontuario: pr, codigo_paciente: cod }), n_registros: P.length + M.length,
-      total_procedimentos_tabela: +tp.toFixed(2), total_medicamentos: +tm.toFixed(2), total_geral_sem_regras: +(tp + tm).toFixed(2) };
+      total_procedimentos_tabela: +tp.toFixed(2), total_medicamentos: +tm.toFixed(2), total_geral_sem_regras: +(tp + tm).toFixed(2),
+      fator_correcao_hospitalar: fc, total_com_fator_correcao: +(tp - th + th * fc + tm).toFixed(2) };
   });
   add("Resumo", resumo, ["prontuario","n_registros","total_geral_sem_regras"]);
-  const avisos = [...state.procs.map(e => ({ aba: "Procedimentos", id: e.id, item: e.co_procedimento, aviso: e.aviso })),
+  const avisos = [...state.procs.map(e => ({ aba: "Procedimentos", id: e.id, item: e.co_procedimento, aviso: e.aviso || e.nota_conferencia })),
                   ...state.ints.map(e => ({ aba: "Internações", id: e.id, item: e.aih, aviso: e.aviso })),
                   ...state.meds.map(e => ({ aba: "Medicamentos", id: e.id, item: e.codigo_catmat, aviso: e.aviso }))].filter(a => a.aviso);
   add("Avisos", avisos, ["aba","id","item","aviso"]);
