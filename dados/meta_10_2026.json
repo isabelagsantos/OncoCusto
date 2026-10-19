@@ -1,24 +1,39 @@
 {
   "bps": {
-    "periodo": "jan/2026 a out/2026",
+    "periodo": "jan/2026 a set/2026",
     "data_geracao": "2026-10-16",
     "n_compras": 10480,
     "n_catmat": 1854,
     "fonte": "Banco de Preços em Saúde (BPS) — Ministério da Saúde",
-    "url_fonte": "https://bps.saude.gov.br/"
+    "url_fonte": "https://bps.saude.gov.br/",
+    "data_inicio": "2026-01",
+    "data_fim": "2026-09",
+    "observacao": "Periodo parcial: ano ainda nao terminou (out a dez/2026 serao incluidos nas proximas atualizacoes). Ultima atualizacao do BPS: out/2026.",
+    "n_medianas": 21400,
+    "n_catmat_item": 1933,
+    "min_compras": 1,
+    "min_compras_site": 3,
+    "observacao_minimo": "Arquivo traz medianas com 1 compra ou mais. O site usa o mínimo do projeto (padrão 3) e, se nenhum nível o atinge, o plano B: o nível mais próximo com ao menos 1 compra, marcado como base fraca."
   },
   "sigtap": {
-    "competencia": "09/2026",
+    "competencia": "10/2026",
     "fonte": "SIGTAP — DATASUS",
     "url_fonte": "http://sigtap.datasus.gov.br/",
-    "n_procedimentos": 5024
+    "n_procedimentos": 5040,
+    "base_origem": "Relatorio Procedimento (Completo) 10/2026, 77 arquivos, 5039 codigos unicos"
   },
   "versao_script": "1.0",
   "sigtap_compatibilidade": {
-    "competencia": "09/2026",
-    "n_relacoes": 12444,
+    "competencia": "10/2026",
+    "n_relacoes": 12535,
     "n_tipos": 14,
-    "fonte": "SIGTAP — DATASUS",
-    "url_fonte": "http://sigtap.datasus.gov.br/"
+    "tipo_relatorio": "Vigentes na competencia"
+  },
+  "ibge": {
+    "n_municipios": 5571,
+    "fonte": "IBGE - DTB 2025"
+  },
+  "situacao": {
+    "n_situacoes": 12
   }
 }
