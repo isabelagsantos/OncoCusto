@@ -156,6 +156,10 @@ input:disabled,select:disabled{opacity:.5}
 .tags{display:flex;flex-wrap:wrap;gap:6px}
 .tag{border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:12px;background:var(--bg);cursor:pointer;user-select:none}
 .tag.on{background:var(--pink-soft);border-color:var(--accent);color:var(--text)}
+.detgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px 18px;font-size:12.5px;padding:4px 2px;width:min(100%,860px);position:sticky;left:0;white-space:normal}
+.detgrid div{min-width:0;overflow-wrap:anywhere}
+.detgrid small{display:block;color:var(--muted);font-family:"IBM Plex Mono",monospace;font-size:11px}
+tr.det td{background:var(--surface-2)}
 .linkbtn{background:none;border:0;padding:0;color:var(--accent-ink);font-size:13px;text-decoration:underline;cursor:pointer}
 
 /* Busca com sugestões */
@@ -321,6 +325,9 @@ footer{max-width:1180px;margin:0 auto;padding:18px 16px 32px;color:var(--muted);
     <h4>Ajuda</h4>
     <ol>
       <li><a href="#sigtap" data-v="sigtap"><span class="num">?</span>Conferir no SIGTAP</a></li>
+      <li><a href="#ajuda-id" data-v="ajuda-id"><span class="num">?</span>O que é id na planilha?</a></li>
+      <li><a href="#limites" data-v="limites"><span class="num">!</span>Limitações do site</a></li>
+      <li><a href="#contato" data-v="contato"><span class="num">@</span>Dúvidas, sugestões e contato</a></li>
     </ol>
   </nav>
 
@@ -479,15 +486,12 @@ footer{max-width:1180px;margin:0 auto;padding:18px 16px 32px;color:var(--muted);
             <div>
               <div class="seg" id="hab" data-k="habilitacao"><button class="on">Sem habilitação</button><button data-hab>Com habilitação</button></div>
               <div class="vig" id="vig"><div><label>Início da vigência</label><input type="date" data-k="hab_inicio"></div><div><label>Fim da vigência</label><input type="date" data-k="hab_fim"></div></div>
+              <div class="help" style="margin-top:6px">Se no CNES a data final aparecer como 99/99/9999, use 31/12/9999 (sem data de término).</div>
               <label class="check" style="margin-top:8px"><input type="checkbox" data-k="hab_conferida">Conferi a habilitação no CNES</label>
             </div>
             <div class="tip" style="grid-column:1/-1">O <b>CNES</b> (Cadastro Nacional de Estabelecimentos de Saúde) é o número que identifica o hospital no SUS. Nele também aparecem as habilitações do serviço. Consulte o da sua instituição em <a href="https://cnes.datasus.gov.br/" target="_blank" rel="noopener">cnes.datasus.gov.br</a>.</div>
           </div>
-          <div class="param"><div><b>SA e SH no mesmo código</b></div><div class="seg" data-k="sa_sh"><button class="on">Contar uma vez</button><button>Somar os dois</button></div></div>
-          <div class="param"><div><b>Data do custo da radioterapia</b></div><div class="seg" data-k="rt_data"><button>Início</button><button class="on">Término</button></div></div>
-          <div class="param"><div><b>Fator estimulador de colônias</b></div><div class="seg" data-k="fec"><button class="on">Uma por mês</button><button>Por aplicação</button></div></div>
-          <div class="param"><div><b>Registros fora da janela da AIH</b></div><div class="seg" data-k="fora_aih"><button class="on">Ambulatoriais</button><button>AIH mais próxima</button></div></div>
-          <div class="param"><div><b>Permanência a maior</b></div><div class="seg" data-k="permanencia"><button class="on">Informada</button><button>Fórmula do SIH</button></div></div>
+          <div class="param"><div><b>Fator estimulador de colônias</b><span>Padrão oficial: uma vez por mês (Manual de Oncologia, p. 71). “Por aplicação” não tem base oficial e serve só como cenário</span></div><div class="seg" data-k="fec"><button class="on">Uma por mês</button><button>Por aplicação</button></div></div>
           <div class="param"><div><b>Fator de correção do SIGTAP <button type="button" class="qm" aria-label="Sobre o fator de correção">?</button></b><span>Só para o cenário do Resumo · padrão 2,8</span></div><input type="text" data-k="fator" placeholder="2,8">
             <div class="tip" style="grid-column:1/-1">A Diretriz Metodológica de Avaliação Econômica (3ª ed., itens XLVI e XLVII) explica que a tabela SIGTAP traz só o repasse federal e cita um fator próximo de <b>2,8</b> para os <b>procedimentos hospitalares</b>, a partir das Contas do SUS. Ela não fixa fator para procedimentos ambulatoriais nem para medicamentos. Por isso o site multiplica por esse fator só o que foi feito em internação, numa coluna separada do Resumo (<b>total_com_fator_correcao</b>), que sai sempre. O caso-base continua com o valor da tabela. Deixe em branco para usar 2,8.</div></div>
         </div>
@@ -512,8 +516,9 @@ footer{max-width:1180px;margin:0 auto;padding:18px 16px 32px;color:var(--muted);
       <div class="panel">
         <h2>Procedimento <small id="proc-comp-lbl"></small></h2>
         <div class="body fields">
-          <div class="f full"><label>Procedimento <span class="req">*</span></label>
-            <div class="ac-wrap"><input type="text" id="proc-busca" autocomplete="off" placeholder="Buscar por código (00.00.00.000-0) ou palavras"></div>
+          <div class="f full"><label>Procedimento <span class="req">*</span> <button type="button" class="qm" aria-label="Procedimento sem correspondência">!</button></label>
+            <div class="tip">Use <b>00.00.00.000-0</b> (“sem correspondência”) quando o procedimento não existe no SIGTAP ou o código não foi encontrado. Ele entra com valor 0,00 e <b>fica fora do cálculo</b>, é contado no Resumo e nas Limitações, e a <b>observação livre passa a ser obrigatória</b> para explicar o que foi feito.</div>
+            <div class="ac-wrap"><input type="text" id="proc-busca" autocomplete="off" placeholder="Buscar por código (00.00.00.000-0) ou palavras; 00.00.00.000-0 = sem correspondência"></div>
             <div id="proc-info" class="hidden"></div>
           </div>
           <div class="f"><label>Data de realização <span class="req">*</span></label><input type="date" data-k="data_realizacao">
@@ -606,6 +611,7 @@ footer{max-width:1180px;margin:0 auto;padding:18px 16px 32px;color:var(--muted);
       <div class="page-head"><div><div class="eyebrow">Etapa 4 · Registro</div><h1>Medicamentos</h1><p>Retirados pelo paciente, fora de procedimentos. Quimioterapia vai em Procedimentos.</p></div></div>
       <div class="subnav" data-sub></div>
       <div class="info" style="margin-bottom:14px">⚠ <span><b>Não registre os medicamentos dados durante a sessão de quimioterapia</b> (por exemplo, dipirona, ondansetrona, dexametasona, anti-inflamatórios, diuréticos, ranitidina, soros e eletrólitos). Eles já estão no valor da APAC de quimioterapia (Portaria SAES/MS 470/2021, art. 25; Manual de Bases Técnicas da Oncologia, p. 155–156). Também não registre aqui antineoplásicos, inclusive orais como a capecitabina: eles vão em Procedimentos, pela APAC.</span></div>
+      <div class="info" style="margin-bottom:14px">ℹ <span data-limite></span></div>
 
       <div class="panel">
         <h2>Paciente e origem</h2>
@@ -619,8 +625,9 @@ footer{max-width:1180px;margin:0 auto;padding:18px 16px 32px;color:var(--muted);
       <div class="panel">
         <h2>Medicamento <small id="med-bps-lbl"></small></h2>
         <div class="body fields">
-          <div class="f full"><label>Medicamento <span class="req">*</span></label>
-            <div class="ac-wrap"><input type="text" id="med-busca" autocomplete="off" placeholder="Buscar por código CATMAT ou nome"></div>
+          <div class="f full"><label>Medicamento <span class="req">*</span> <button type="button" class="qm" aria-label="Medicamento sem correspondência">!</button></label>
+            <div class="tip">Use <b>000000</b> (“sem correspondência”) quando o medicamento não existe no CATMAT/BPS ou o código não foi encontrado. Ele entra com valor 0,00 e <b>fica fora do cálculo</b>, é contado no Resumo e nas Limitações, e a <b>observação livre passa a ser obrigatória</b> para explicar o que foi retirado.</div>
+            <div class="ac-wrap"><input type="text" id="med-busca" autocomplete="off" placeholder="Buscar por número CATMAT ou nome; 000000 = sem correspondência"></div>
             <div id="med-info" class="hidden"></div>
           </div>
           <div class="f"><label>Unidade de fornecimento <span class="req">*</span></label><select data-k="unidade" id="med-un"><option value="">Escolha o medicamento</option></select></div>
@@ -660,7 +667,7 @@ footer{max-width:1180px;margin:0 auto;padding:18px 16px 32px;color:var(--muted);
 
     <!-- ================= REVISÃO ================= -->
     <section class="view" id="v-revisao">
-      <div class="page-head"><div><div class="eyebrow">Etapa 5</div><h1>Revisão</h1><p>Todas as entradas com o valor de tabela, ainda sem as regras de custeio.</p></div></div>
+      <div class="page-head"><div><div class="eyebrow">Etapa 5</div><h1>Revisão</h1><p>Todas as entradas com o valor de tabela já com as regras de custeio. Clique em ▸ para ver todos os campos preenchidos de uma entrada.</p></div></div>
 
       <div class="stats">
         <div class="stat"><small>Pacientes</small><strong id="st-pac">0</strong></div>
@@ -679,7 +686,7 @@ footer{max-width:1180px;margin:0 auto;padding:18px 16px 32px;color:var(--muted);
           <label class="check"><input type="checkbox" id="fl-aviso">Só com aviso</label>
         </div>
         <div class="table-wrap"><table>
-          <thead><tr><th>Paciente</th><th>Data</th><th>Código</th><th>Descrição</th><th>Local</th><th>Situação</th><th style="text-align:right">Valor</th><th>Aviso</th><th></th></tr></thead>
+          <thead><tr><th></th><th>Paciente</th><th>Data</th><th>Código</th><th>Descrição</th><th>Local</th><th>Situação</th><th style="text-align:right">Valor</th><th>Aviso</th><th></th></tr></thead>
           <tbody data-rows="rev"></tbody>
         </table></div>
       </div>
@@ -722,6 +729,38 @@ footer{max-width:1180px;margin:0 auto;padding:18px 16px 32px;color:var(--muted);
       </div>
     </section>
 
+    <!-- ================= AJUDA: ID ================= -->
+    <section class="view" id="v-ajuda-id">
+      <button class="back" data-v="inicio">← Voltar ao início</button>
+      <div class="page-head"><div><div class="eyebrow">Ajuda</div><h1>O que é id na planilha?</h1><p>A primeira coluna de cada aba de registros.</p></div></div>
+      <div class="panel"><div class="body">
+        <p>O <b>id</b> é um identificador interno e único de cada registro (procedimento, internação ou medicamento), gerado pelo site na hora em que o registro é salvo. Não é número sequencial e não tem significado clínico: serve só para o site e para quem analisa a planilha.</p>
+        <p>Ele permite: (1) ligar cada linha das abas <b>Avisos</b> e <b>Limitações</b> ao registro de origem; (2) evitar duplicidades ao reabrir uma planilha ou juntar arquivos da equipe; (3) manter a identidade do registro mesmo que a ordem das linhas mude. <b>Não apague nem edite a coluna id</b> se for reabrir a planilha no site.</p>
+      </div></div>
+    </section>
+
+    <!-- ================= LIMITAÇÕES ================= -->
+    <section class="view" id="v-limites">
+      <button class="back" data-v="inicio">← Voltar ao início</button>
+      <div class="page-head"><div><div class="eyebrow">Ajuda</div><h1>Limitações do site</h1><p>O que o OncoCusto calcula e o que ele não inclui.</p></div></div>
+      <div class="panel"><div class="body">
+        <p data-limite></p>
+        <p>Códigos sem correspondência (procedimento 00.00.00.000-0 e medicamento 000000) entram com valor 0,00, ficam fora do cálculo e são contados no Resumo e na aba Limitações da planilha.</p>
+        <p class="help">As regras de cálculo estão no Manual de regras de custeio do app.</p>
+      </div></div>
+    </section>
+
+    <!-- ================= CONTATO ================= -->
+    <section class="view" id="v-contato">
+      <button class="back" data-v="inicio">← Voltar ao início</button>
+      <div class="page-head"><div><div class="eyebrow">Ajuda</div><h1>Dúvidas, sugestões e contato</h1><p>Encontrou um erro ou tem uma ideia?</p></div></div>
+      <div class="panel"><div class="body">
+        <p>Escreva para o e-mail público no perfil da idealizadora no GitHub: <a href="https://github.com/isabelagsantos" target="_blank" rel="noopener">github.com/isabelagsantos</a>.</p>
+        <p>Ao relatar um problema, informe a <b>versão do site</b> (rodapé da página e aba Parâmetros da planilha) e, se possível, a mensagem do aviso. <b>Não envie dados de pacientes.</b></p>
+        <p class="help" id="contato-versao"></p>
+      </div></div>
+    </section>
+
   </main>
 </div>
 
@@ -747,7 +786,8 @@ footer{max-width:1180px;margin:0 auto;padding:18px 16px 32px;color:var(--muted);
 const MANUTENCAO = { ativo: false, inicio: "2026-10-20", dias_uteis: 5 };
 
 const CONFIG = {
-  versaoSite: "0.4 · campo APAC, plano B do BPS, aviso de suporte e cenário do fator de correção",
+  versaoSite: "0.5",
+  versaoNotas: "regras de custeio de APAC e AIH, incremento de 20%, códigos sem correspondência, horário de Brasília e Ajuda ampliada",
   pastas: ["dados/", ""],               // procura primeiro em dados/, depois na raiz do repositório
   sigtap: {
     "10/2026": { proc: "sigtap_procedimentos_10_2026.json", compat: "sigtap_compatibilidade_10_2026.json" },
@@ -770,7 +810,10 @@ const fmtCod = c => c && c.length === 10 ? `${c.slice(0,2)}.${c.slice(2,4)}.${c.
 const brl = (v, dec = 2) => v == null || isNaN(v) ? "—" : Number(v).toLocaleString("pt-BR", {style:"currency", currency:"BRL", minimumFractionDigits:2, maximumFractionDigits:dec});
 const num = v => Number(v).toLocaleString("pt-BR");
 const dataBR = d => /^\d{4}-\d{2}-\d{2}$/.test(d || "") ? d.split("-").reverse().join("/") : (d || "—");
-const hoje = () => new Date().toISOString().slice(0, 10);
+const FUSO = "America/Sao_Paulo";
+const hoje = () => new Date().toLocaleDateString("sv-SE", { timeZone: FUSO });
+const agoraBR = () => { const [d, t] = new Date().toLocaleString("sv-SE", { timeZone: FUSO }).split(" "); return `${d.split("-").reverse().join("-")} ${t}`; };
+const ehData = d => /^\d{4}-\d{2}-\d{2}$/.test(d || "");
 const uid = () => (crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2));
 const debounce = (fn, ms) => { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); }; };
 let toastT;
@@ -852,7 +895,8 @@ async function carregarSigtap(comp){
   const s = DB.sigtap[comp] = { proc: [], byCode: new Map(), compat: new Map(), pronto: false };
   await Promise.all([
     carregar(`SIGTAP ${comp} · procedimentos`, cfg.proc, d => {
-      d.forEach(p => { p._n = norm(p.no_procedimento); s.byCode.set(p.co_procedimento, p); });
+      d.forEach(p => { p._n = norm(p.no_procedimento); s.byCode.set(p.co_procedimento, p);
+        if (p.co_procedimento.startsWith("0304") && p.instrumento_registro === "03" && !QT_HOSP.has(p.co_procedimento)) POR_DIA.add(p.co_procedimento); });   // internações de oncologia pagas por AIH
       s.proc = d; return d.length;
     }),
     carregar(`SIGTAP ${comp} · compatibilidades`, cfg.compat, d => {
@@ -860,6 +904,11 @@ async function carregarSigtap(comp){
       return d.length;
     })
   ]);
+  if (!s.byCode.get(SC_PROC)?.virtual) {
+    /* O SIGTAP tem um registro com o código 00.00.00.000-0 (exame "N/C" sem valor); aqui o código passa a significar "sem correspondência" */
+    const v = { co_procedimento: SC_PROC, no_procedimento: "SEM CORRESPONDÊNCIA (procedimento fora do SIGTAP)", classificacao: "", vl_sa: 0, vl_tot_amb: 0, vl_sh: 0, vl_sp: 0, vl_tot_hosp: 0, instrumento_registro: "", qtd_max: null, _n: "SEM CORRESPONDENCIA FORA DO SIGTAP", virtual: true };
+    s.byCode.set(SC_PROC, v); s.proc = [v, ...s.proc.filter(p => p.co_procedimento !== SC_PROC)];
+  }
   s.pronto = true;
   return s;
 }
@@ -890,6 +939,10 @@ async function carregarBPS(base){
       return d.length;
     })
   ]);
+  if (!b.byCat.has(SC_MED)) {
+    const v = { co_catmat: SC_MED, ds_item: "SEM CORRESPONDÊNCIA (medicamento fora do CATMAT/BPS)", _n: "SEM CORRESPONDENCIA FORA DO CATMAT BPS", unidades: [{ un_fornecimento: "Não se aplica" }], virtual: true };
+    b.byCat.set(SC_MED, v); b.itens = [v, ...b.itens];
+  }
   b.pronto = true;
   return b;
 }
@@ -1032,7 +1085,8 @@ function renderCabecalho(){
   $("#ft-sigtap").textContent = `SIGTAP ${compAtual()}`;
   const b = DB.bps[bpsAtual()];
   $("#ft-bps").textContent = `BPS ${bpsAtual()}${b?.periodo ? " (" + b.periodo + ")" : ""}`;
-  $("#ft-versao").textContent = `Versão do site ${CONFIG.versaoSite}`;
+  $("#ft-versao").textContent = `Versão do site ${CONFIG.versaoSite} · ${CONFIG.versaoNotas}`;
+  const cv = $("#contato-versao"); if (cv) cv.textContent = `Versão do site: ${CONFIG.versaoSite} (${CONFIG.versaoNotas}).`;
   mostrarManutencao();
   $("#proc-comp-lbl").textContent = `· SIGTAP ${compAtual()}`;
   $("#med-bps-lbl").textContent = `· BPS ${bpsAtual()}`;
@@ -1045,7 +1099,7 @@ $("#proj-salvar").addEventListener("click", async () => {
   const falta = [["titulo","Título"],["nome_uso","Nome de uso"],["centro","Centro"],["usuario","Usuário"]].filter(([k]) => !p[k]).map(([, n]) => n);
   if (falta.length) { toast("Preencha: " + falta.join(", "), true); return; }
   const mudouBase = state.projeto && (state.projeto.comp_sigtap !== p.comp_sigtap || state.projeto.base_bps !== p.base_bps);
-  state.projeto = { ...p, criado_em: state.projeto?.criado_em || new Date().toISOString() };
+  state.projeto = { ...p, criado_em: state.projeto?.criado_em || agoraBR() };
   salvarLocal();
   await Promise.all([carregarSigtap(compAtual()), carregarBPS(bpsAtual())]);
   popularBases(); recalcular(); renderTudo();
@@ -1183,11 +1237,6 @@ function escolherProc(p){
   procBusca.value = procBusca.dataset.escolhido = `${fmtCod(p.co_procedimento)} — ${p.no_procedimento}`;
   renderProcInfo();
 }
-function valorTabela(p, qtd){
-  if (!p) return null;
-  const unit = (p.vl_sa || 0) > 0 ? p.vl_sa : (p.vl_tot_hosp || 0);
-  return unit * (Number(qtd) || 1);
-}
 function renderProcInfo(){
   const box = $("#proc-info");
   if (!selProc) { box.classList.add("hidden"); box.innerHTML = ""; renderOPM(); return; }
@@ -1238,9 +1287,10 @@ $("#proc-salvar").addEventListener("click", () => {
   const e = ler(v);
   if (!selProc) { toast("Escolha um procedimento da lista.", true); procBusca.focus(); return; }
   if (!e.prontuario) { toast("Informe o prontuário.", true); return; }
+  if (selProc.co_procedimento === SC_PROC && !e.observacao_usuario) { toast("Código sem correspondência: a observação livre é obrigatória.", true); $("[data-k=observacao_usuario]", v).focus(); return; }
   if (ehOPM(selProc.co_procedimento) && !e.co_principal_opm) { toast("Escolha o procedimento principal do OPM.", true); $("#opm-principal").focus(); return; }
   if (!ehOPM(selProc.co_procedimento)) { e.co_principal_opm = ""; e.qtd_conferida_sigtap = ""; }
-  Object.assign(e, { id: uid(), usuario: state.projeto.usuario, co_procedimento: selProc.co_procedimento, criado_em: new Date().toISOString() });
+  Object.assign(e, { id: uid(), usuario: state.projeto.usuario, co_procedimento: selProc.co_procedimento, criado_em: agoraBR() });
   state.procs.push(e);
   recalcular(); salvarLocal(); renderTudo();
   limpar(v); selProc = null; procBusca.value = ""; procBusca.dataset.escolhido = ""; renderProcInfo(); atualizarLocal();
@@ -1257,7 +1307,7 @@ $("#int-salvar").addEventListener("click", () => {
   const e = ler(v);
   if (!e.prontuario || !e.aih) { toast("Informe o prontuário e o nº da AIH.", true); return; }
   if (state.ints.some(i => i.prontuario === e.prontuario && i.aih === e.aih)) { toast("Esta AIH já está cadastrada para este prontuário.", true); return; }
-  Object.assign(e, { id: uid(), usuario: state.projeto.usuario, criado_em: new Date().toISOString() });
+  Object.assign(e, { id: uid(), usuario: state.projeto.usuario, criado_em: agoraBR() });
   state.ints.push(e);
   recalcular(); salvarLocal(); renderTudo();
   limpar(v);
@@ -1271,7 +1321,7 @@ let selMed = null;
 const medBusca = $("#med-busca");
 autocomplete(medBusca,
   q => { const b = DB.bps[bpsAtual()]; return b?.pronto ? buscaGenerica(b.itens, q, it => it.co_catmat) : []; },
-  it => `<span class="mono">${esc(it.co_catmat)}</span><span>${esc(it.ds_item)}</span><small>${DB.bps[bpsAtual()]?.comPreco.has(it.co_catmat) ? `${it.unidades.length} ${it.unidades.length === 1 ? "unidade" : "unidades"}` : "sem preço no BPS"}</small>`,
+  it => `<span class="mono">${esc(it.co_catmat)}</span><span>· ${esc(it.ds_item)}</span>`,
   it => escolherMed(it)
 );
 medBusca.addEventListener("input", () => { if (selMed && medBusca.value !== medBusca.dataset.escolhido) { selMed = null; medBusca.dataset.escolhido = ""; renderMedInfo(); } });
@@ -1335,7 +1385,8 @@ $("#med-salvar").addEventListener("click", () => {
   if (!selMed) { toast("Escolha um medicamento da lista.", true); medBusca.focus(); return; }
   if (!e.prontuario) { toast("Informe o prontuário.", true); return; }
   if (!e.uf) { toast("Informe a UF de retirada.", true); return; }
-  Object.assign(e, { id: uid(), usuario: state.projeto.usuario, codigo_catmat: selMed.co_catmat, criado_em: new Date().toISOString() });
+  if (selMed.co_catmat === SC_MED && !e.observacao_usuario) { toast("Código sem correspondência: a observação livre é obrigatória.", true); $("[data-k=observacao_usuario]", v).focus(); return; }
+  Object.assign(e, { id: uid(), usuario: state.projeto.usuario, codigo_catmat: selMed.co_catmat, criado_em: agoraBR() });
   state.meds.push(e);
   recalcular(); salvarLocal(); renderTudo();
   limpar(v); selMed = null; medBusca.value = ""; medBusca.dataset.escolhido = ""; renderMedInfo();
@@ -1353,7 +1404,7 @@ document.addEventListener("change", e => {
 });
 
 /* =====================================================================
-   RECÁLCULO (só valores de tabela; as regras entram depois)
+   RECÁLCULO E AVISOS DE REVISÃO
    ===================================================================== */
 /* Aviso de revisão: calcula o fim somando dias úteis (seg a sex) ao início */
 function fimManutencao(inicio, n){
@@ -1373,9 +1424,26 @@ function mostrarManutencao(){
   el.classList.remove("hidden");
 }
 
+/* =====================================================================
+   REGRAS DE CUSTEIO
+   Seguem o que está nos manuais e nos documentos oficiais (Portaria SAES/MS 470/2021,
+   Manual de Bases Técnicas da Oncologia 30ª ed., Manual do SIH, SIGTAP). Não há parâmetro de interpretação.
+   ===================================================================== */
+const SC_PROC = "0000000000", SC_MED = "000000";
+const semCorr = e => e.co_procedimento === SC_PROC || e.codigo_catmat === SC_MED;
+const POR_DIA = new Set(["0304010111","0304010596","0304080039","0304100013","0304080020"]); // internações pagas por dia (AIH)
+const QT_HOSP = new Set(["0304080047","0304080063"]);                                          // quimio intra-arterial e intracavitária (SH)
+const ehAPACqt = c => !!c && String(c).startsWith("0304") && !POR_DIA.has(String(c)) && !QT_HOSP.has(String(c));
+const ehQuimioRadio = c => ehAPACqt(c);
+const ehRT = c => ehAPACqt(c) && String(c).startsWith("030401");
+const ehQuimio = c => ehAPACqt(c) && !String(c).startsWith("030401");
+const instr = p => String(p?.instrumento_registro || "").split(/\s*,\s*/).filter(Boolean);
+const r2 = v => Math.round((v + Number.EPSILON) * 100) / 100;
+const diffDias = (a, b) => Math.round((Date.UTC(...b.split("-").map((x, i) => i === 1 ? x - 1 : +x)) - Date.UTC(...a.split("-").map((x, i) => i === 1 ? x - 1 : +x))) / 864e5);
+const PCT_AIH = { seq: [1, .75, .5, .5, .5], mult: [1, .75, .75, .6, .5], outras: [1, .75, .5] };
+const tipoAIH = t => /04\.15\.02\.005-0/.test(t || "") ? "seq" : /04\.15\.01\.001-2/.test(t || "") ? "mult" : /04\.15\.02\.003-4/.test(t || "") ? "outras" : "comum";
+
 /* APAC (campo opcional): até 3 competências por APAC de quimio/hormônio; radioterapia é APAC única */
-const ehQuimioRadio = c => !!c && String(c).startsWith("0304");
-const ehQuimio = c => ehQuimioRadio(c) && !String(c).startsWith("030401");   // 03.04.01 = radioterapia
 function avisoAPAC(e){
   const ap = String(e.apac || "").trim();
   if (!ap || !ehQuimioRadio(e.co_procedimento) || !e.data_realizacao || !/^\d{4}-\d{2}/.test(e.data_realizacao)) return "";
@@ -1384,30 +1452,234 @@ function avisoAPAC(e){
   const pos = ord.indexOf(e.data_realizacao.slice(0, 7));
   return pos >= 3 ? `APAC ${ap} com mais de 3 competências (${ord.length}): conferir se é nova APAC` : "";
 }
+
 function recalcular(){
   const s = DB.sigtap[compAtual()];
+  const hj = hoje();
+  [...state.procs, ...state.meds, ...state.ints].forEach(e => { if (!e.id) e.id = uid(); });
+  const IDX = new Map(state.procs.map((e, i) => [e.id, i]));
+  const ordemReg = (a, b) => (a.data_custo || "").localeCompare(b.data_custo || "") || IDX.get(a.id) - IDX.get(b.id);
+  const PX = new Map(), INT = new Map(), VAL = new Map(), AV = new Map(), OB = new Map();
+  const add = (M, e, m) => { if (!m) return; const l = M.get(e.id) || []; if (!l.includes(m)) l.push(m); M.set(e.id, l); };
+  const av = (e, m) => add(AV, e, m), ob = (e, m) => add(OB, e, m);
+  const set = (e, v, forma, hosp) => { VAL.set(e.id, v); e.forma_cobranca = forma; e.item_hospitalar = hosp ? "Sim" : "Não"; };
+  const mesDe = e => ehData(e.data_custo) ? e.data_custo.slice(0, 7) : "sem-data";
+
+  /* 1. Dados de cada procedimento, local do ato e conferências de data */
   state.procs.forEach(e => {
     const p = s?.byCode.get(e.co_procedimento);
+    PX.set(e.id, p);
     e.competencia = compAtual();
     e.no_procedimento = p?.no_procedimento ?? e.no_procedimento ?? "";
     e.classificacao = p?.classificacao ?? "";
     e.vl_sa = p?.vl_sa ?? null; e.vl_sh = p?.vl_sh ?? null; e.vl_sp = p?.vl_sp ?? null; e.vl_tot_hosp = p?.vl_tot_hosp ?? null;
+    e.data_custo = ehRT(e.co_procedimento) && ehData(e.rt_fim) ? e.rt_fim : (e.data_realizacao || "");
     const i = internacaoDe(e.prontuario, e.data_realizacao);
     e.local_ato = i ? "Hospitalar" : "Ambulatorial";
     e.aih_do_periodo = i?.aih || "";
-    e.valor_tabela = p ? valorTabela(p, e.quantidade) : null;
-    e.aviso = !s?.pronto ? "Base SIGTAP não carregada"
-            : !p ? `Código não existe em ${compAtual()}`
-            : (p.vl_sa == null && p.vl_tot_hosp == null) ? `Novo em ${compAtual()}: sem valor na base`
-            : p.alterado_na_competencia ? `Alterado em ${compAtual()}: conferir valor` : "";
-    const ap = avisoAPAC(e);
-    if (ap) e.aviso = e.aviso ? e.aviso + " | " + ap : ap;
+    if (i) INT.set(e.id, i);
+    e.forma_cobranca = ""; e.item_hospitalar = "Não";
+    if (e.aih && !i) av(e, state.ints.some(x => x.prontuario === e.prontuario && x.aih === e.aih) ? `Data fora do período da AIH ${e.aih}: tratado como ambulatorial` : `AIH ${e.aih} não está cadastrada em Internações`);
+    else if (e.aih && i && i.aih !== e.aih) av(e, `AIH informada (${e.aih}) difere da internação da data (${i.aih})`);
+    if (!s?.pronto) av(e, "Base SIGTAP não carregada");
+    else if (!p) av(e, `Código não existe em ${compAtual()}`);
+    else if (p.vl_sa == null && p.vl_tot_hosp == null) av(e, `Novo em ${compAtual()}: sem valor na base`);
+    else if (p.alterado_na_competencia) av(e, `Alterado em ${compAtual()}: conferir valor`);
+    av(e, avisoAPAC(e));
     const o = validarOPM(e);
     e.nota_conferencia = o?.nota || "";
-    if (o?.aviso) e.aviso = e.aviso ? e.aviso + " | " + o.aviso : o.aviso;
+    if (o?.aviso) av(e, o.aviso);
+    if (ehData(e.data_realizacao) && e.data_realizacao > hj) av(e, "Data de realização no futuro");
+    if (ehData(e.data_pedido) && e.data_pedido > hj) av(e, "Data do pedido no futuro");
+    if (ehData(e.data_realizacao) && ehData(e.data_pedido) && e.data_realizacao < e.data_pedido) av(e, "Data de realização anterior à do pedido");
+    if (semCorr(e)) { set(e, 0, "Fora do cálculo", false); ob(e, "Sem correspondência: fora do cálculo"); av(e, "Sem correspondência: fora do cálculo"); }
   });
+  const ativos = state.procs.filter(e => PX.get(e.id) && !semCorr(e));
+
+  /* 2. Quimioterapia e hormonioterapia (APAC): valor mensal, um principal por vez, secundários até a quantidade do par */
+  const mensal = new Map();
+  ativos.filter(e => ehQuimio(e.co_procedimento)).forEach(e => { const k = e.prontuario + "|" + mesDe(e); if (!mensal.has(k)) mensal.set(k, []); mensal.get(k).push(e); });
+  const compSec = (pri, e) => (s.compat.get(pri.co_procedimento) || []).filter(r => r.co_compativel === e.co_procedimento && /Secund/i.test(r.tipo));
+  mensal.forEach(G => {
+    G.sort(ordemReg);
+    const puros = G.filter(e => { const t = instr(PX.get(e.id)); return t.includes("06") && !t.includes("07"); });
+    const papel = new Map();
+    G.forEach(e => {
+      const t = instr(PX.get(e.id));
+      if (t.includes("07") && !t.includes("06")) papel.set(e.id, "S");
+      else if (t.includes("07") && t.includes("06")) papel.set(e.id, puros.some(pr => compSec(pr, e).length) ? "S" : "P*");
+      else papel.set(e.id, "P");
+    });
+    const pri = G.filter(e => papel.get(e.id) !== "S");
+    const vistos = new Set();
+    pri.forEach(e => {
+      const p = PX.get(e.id);
+      if (!vistos.has(e.co_procedimento)) {
+        vistos.add(e.co_procedimento);
+        set(e, r2((p.vl_sa || 0) * Math.min(Number(e.quantidade) || 1, p.qtd_max || 1)), "APAC", false);
+      } else { set(e, 0, "APAC", false); ob(e, "Quimioterapia já paga na competência"); }
+      if (papel.get(e.id) === "P*") av(e, "Secundário sem principal compatível no mês (este código também pode ser principal): conferir o CID");
+    });
+    if (vistos.size > 1) pri.forEach(e => av(e, "Excludente na competência – verificar: mais de um procedimento principal no mês (Portaria SAES/MS 470/2021, art. 9º; exceções no § 1º)"));
+    const usados = new Map();
+    G.filter(e => papel.get(e.id) === "S").forEach(e => {
+      const p = PX.get(e.id);
+      const pares = pri.flatMap(pr => compSec(pr, e).map(r => ({ pr, r })));
+      const limite = pares.length ? (Math.max(...pares.map(x => x.r.qtd || 0)) || p.qtd_max || 1) : (p.qtd_max || 1);
+      if (!pares.length) av(e, "Secundário sem principal compatível no mês");
+      else if (e.apac && !pares.some(x => !x.pr.apac || x.pr.apac === e.apac)) av(e, "Secundário em APAC diferente da do principal compatível");
+      const q = Number(e.quantidade) || 1, u = usados.get(e.co_procedimento) || 0;
+      const porAplic = e.co_procedimento === "0304080012" && state.projeto?.fec === "Por aplicação";
+      const perm = porAplic ? q : Math.max(0, Math.min(q, limite - u));
+      usados.set(e.co_procedimento, u + perm);
+      if (perm < q) av(e, `Quantidade acima do permitido no mês (limite do par: ${limite}): cobrado até o limite`);
+      set(e, r2((p.vl_sa || 0) * perm), "APAC", false);
+    });
+  });
+
+  /* 3. Radioterapia (APAC única): data do custo = término; no máximo duas ao mesmo tempo */
+  const rts = ativos.filter(e => ehRT(e.co_procedimento));
+  const rtSec = e => { const t = instr(PX.get(e.id)); return t.includes("07") && !t.includes("06"); };
+  const rtPri = rts.filter(e => !rtSec(e));
+  rtPri.forEach(e => {
+    const p = PX.get(e.id), q = Number(e.quantidade) || 1;
+    set(e, r2((p.vl_sa || 0) * q), "APAC", false);
+    if (p.qtd_max && q > p.qtd_max) av(e, `Quantidade ${q} acima do máximo do SIGTAP (${p.qtd_max}): radioterapia é por tratamento completo`);
+  });
+  const iv = e => { const a = ehData(e.rt_inicio) ? e.rt_inicio : e.data_realizacao, b = ehData(e.rt_fim) ? e.rt_fim : a; return ehData(a) && ehData(b) ? [a, b] : null; };
+  rtPri.forEach(e => {
+    const me = iv(e); if (!me) return;
+    const outros = rtPri.filter(x => x.prontuario === e.prontuario && iv(x));
+    const dias = [me[0], ...outros.map(x => iv(x)[0]).filter(d => d >= me[0] && d <= me[1])];
+    const max = Math.max(...dias.map(d => outros.filter(x => iv(x)[0] <= d && d <= iv(x)[1]).length));
+    if (max > 2) av(e, "Mais de 2 radioterapias concomitantes (Portaria 263/2019, art. 10, II)");
+  });
+  const usadosRT = new Map();
+  rts.filter(rtSec).sort(ordemReg).forEach(e => {
+    const p = PX.get(e.id);
+    const pares = rtPri.filter(x => x.prontuario === e.prontuario && ((x.apac && e.apac && x.apac === e.apac) || mesDe(x) === mesDe(e))).flatMap(pr => compSec(pr, e));
+    const limite = pares.length ? (Math.max(...pares.map(r => r.qtd || 0)) || p.qtd_max || 1) : (p.qtd_max || 1);
+    if (!pares.length) av(e, "Secundário sem principal compatível no mês");
+    const k = e.prontuario + "|" + e.co_procedimento + "|" + mesDe(e);
+    const q = Number(e.quantidade) || 1, u = usadosRT.get(k) || 0, perm = Math.max(0, Math.min(q, limite - u));
+    usadosRT.set(k, u + perm);
+    if (perm < q) av(e, `Quantidade acima do permitido (limite do par: ${limite}): cobrado até o limite`);
+    set(e, r2((p.vl_sa || 0) * perm), "APAC", false);
+  });
+
+  /* 4. Procedimentos de internação pagos por dia e quimioterapia em SH */
+  ativos.filter(e => POR_DIA.has(e.co_procedimento)).forEach(e => {
+    const p = PX.get(e.id), q = Number(e.quantidade) || 1, m = p.qtd_max || q, perm = Math.min(q, m);
+    if (perm < q) av(e, `Quantidade ${q} acima do máximo do SIGTAP (${m}): cobrado até o limite`);
+    if (!INT.has(e.id)) av(e, "Fora do período de uma AIH cadastrada: cadastre a internação");
+    set(e, r2((p.vl_tot_hosp || 0) * perm), "AIH", true);
+  });
+  ativos.filter(e => QT_HOSP.has(e.co_procedimento)).forEach(e => {
+    const p = PX.get(e.id);
+    if (!INT.has(e.id)) av(e, "Fora do período de uma AIH cadastrada: cadastre a internação");
+    set(e, r2((p.vl_tot_hosp || 0) * (Number(e.quantidade) || 1)), "AIH", true);
+  });
+
+  /* 5. Demais procedimentos: internação (AIH) ou ambulatorial (BPA) */
+  const resto = ativos.filter(e => !VAL.has(e.id));
+  const aih = new Map();
+  resto.forEach(e => {
+    const i = INT.get(e.id);
+    if (i) { const k = e.prontuario + "|" + i.aih; if (!aih.has(k)) aih.set(k, []); aih.get(k).push(e); return; }
+    const p = PX.get(e.id), q = Number(e.quantidade) || 1;
+    if ((p.vl_sa || 0) > 0) set(e, r2(p.vl_sa * q), "Ambulatorial", false);
+    else if ((p.vl_tot_amb || 0) > 0) set(e, r2(p.vl_tot_amb * q), "Ambulatorial", false);
+    else if ((p.vl_tot_hosp || 0) > 0) { set(e, r2(p.vl_tot_hosp * q), "AIH (sem internação cadastrada)", true); av(e, "Procedimento hospitalar sem internação cadastrada nesta data: valor hospitalar usado; cadastre a AIH em Internações"); }
+    else set(e, 0, "Ambulatorial", false);
+  });
+  aih.forEach(G => {
+    const int = INT.get(G[0].id), tipo = tipoAIH(int.tipo_aih);
+    const dias = ehData(int.data_entrada) && ehData(int.data_alta) ? Math.max(1, diffDias(int.data_entrada, int.data_alta)) : null;
+    const ehCir = e => instr(PX.get(e.id)).includes("03") && e.co_procedimento.startsWith("04") && !e.co_procedimento.startsWith("0415");
+    const cir = G.filter(ehCir).sort((a, b) => (Number(a.ordem_aih) || 1e9) - (Number(b.ordem_aih) || 1e9) || ordemReg(a, b));
+    const pcts = PCT_AIH[tipo];
+    cir.forEach((e, k) => {
+      const p = PX.get(e.id);
+      let q = Number(e.quantidade) || 1;
+      if (p.qtd_max && q > p.qtd_max) { av(e, `Quantidade ${q} acima do máximo do SIGTAP (${p.qtd_max}): cobrado até o limite`); q = p.qtd_max; }
+      let v;
+      if (!pcts) v = (p.vl_tot_hosp || 0) * q;
+      else {
+        if (k >= pcts.length) { v = 0; ob(e, `Acima do limite de ${pcts.length} procedimentos da AIH`); }
+        else v = (((p.vl_sh ?? p.vl_tot_hosp ?? 0) * pcts[k]) + (p.vl_sp || 0)) * q;
+        if (!e.ordem_aih) av(e, "Sem ordem na AIH: usada a ordem das datas");
+        if (tipo === "seq") {
+          const ref = k === 0 ? "0415020050" : cir[0].co_procedimento;
+          if (!(s.compat.get(ref) || []).some(r => r.co_compativel === e.co_procedimento)) av(e, `Incompatível – verificar no SIGTAP (não consta como compatível com ${fmtCod(ref)})`);
+        } else if (e.co_procedimento.startsWith("0416")) av(e, "Procedimento 04.16 não entra em AIH de cirurgias múltiplas ou de outras sequenciais (Manual do SIH, item 42.1)");
+      }
+      set(e, r2(v), "AIH", true);
+    });
+    const uti = G.filter(e => e.co_procedimento.startsWith("0802") && /TERAPIA INTENSIVA/.test(norm(PX.get(e.id).no_procedimento))).reduce((a, e) => a + (Number(e.quantidade) || 0), 0);
+    G.filter(e => !ehCir(e)).forEach(e => {
+      const p = PX.get(e.id), c4 = e.co_procedimento.slice(0, 4);
+      let q = Number(e.quantidade) || 1, v;
+      if (c4 === "0202" || c4 === "0204") { v = 0; ob(e, "Incluído na AIH"); }
+      else {
+        if (e.co_procedimento === "0802010199") {
+          const media = cir.length ? PX.get(cir[0].id).media_permanencia : null;
+          if (dias != null && media) {
+            const calc = Math.max(0, dias - 2 * media - uti);
+            if (calc !== q) av(e, `Permanência a maior pela fórmula do SIH (${dias} dias − 2 × média ${media} − ${uti} de UTI = ${calc}); quantidade informada: ${q}`);
+            q = calc;
+          } else av(e, "Permanência a maior: faltam as datas ou a média de permanência do procedimento principal; mantida a quantidade informada");
+        }
+        const tot = p.vl_tot_hosp || 0;
+        if (!tot) { v = 0; ob(e, "Incluído na AIH"); }
+        else {
+          v = tot * q;
+          if (p.qtd_max && q > p.qtd_max && !ehOPM(e.co_procedimento)) av(e, `Quantidade ${q} acima do máximo do SIGTAP (${p.qtd_max})`);
+        }
+      }
+      set(e, r2(v), "AIH", true);
+    });
+    /* conferências da AIH */
+    const tomos = new Map();
+    G.filter(e => /^020[67]/.test(e.co_procedimento)).sort(ordemReg).forEach(e => { if (tomos.has(e.co_procedimento)) av(e, "Mesmo código de tomografia/ressonância repetido na AIH: cada código é pago uma vez por AIH (Manual do SIH, item 14)"); else tomos.set(e.co_procedimento, 1); });
+    const acomp = G.filter(e => /DIARIA DE ACOMPANHANTE/.test(norm(PX.get(e.id).no_procedimento)));
+    const nac = acomp.reduce((a, e) => a + (Number(e.quantidade) || 0), 0);
+    if (dias != null && nac > dias) acomp.forEach(e => av(e, `Diárias de acompanhante (${nac}) acima dos dias de internação (${dias}) (Manual do SIH, item 10.1)`));
+  });
+
+  /* 6. Situações (AP, IA, DP) aplicadas ao valor; depois o incremento */
+  const dp = new Set();
+  [...state.procs].sort(ordemReg).forEach(e => {
+    if (!VAL.has(e.id) || semCorr(e)) return;
+    const sg = e.situacao || [];
+    let v = VAL.get(e.id);
+    if (sg.includes("AP")) { if (v) ob(e, "Situação AP: custo 0,00"); v = 0; }
+    else if (sg.includes("IA")) { if (v) ob(e, "Situação IA: custo 0,00 (incluído na AIH)"); v = 0; }
+    else if (sg.includes("DP")) { const k = e.prontuario + "|" + e.co_procedimento; if (dp.has(k)) { if (v) ob(e, "Situação DP: repetição com custo 0,00"); v = 0; } else dp.add(k); }
+    VAL.set(e.id, v);
+  });
+  const hab = state.projeto?.habilitacao === "Com habilitação", hi = state.projeto?.hab_inicio, hf = state.projeto?.hab_fim;
+  state.procs.forEach(e => {
+    const p = PX.get(e.id);
+    if (!VAL.has(e.id)) { e.valor_tabela = null; e.valor_sem_incremento = null; e.incremento_aplicado = "Não se aplica"; }
+    else {
+      const base = VAL.get(e.id), temInc = /1717|1718/.test(p?.incremento || "");
+      let v = base, ap = "Não se aplica";
+      if (temInc) {
+        ap = "Não";
+        const dentro = hab && ehData(e.data_custo) && (!hi || e.data_custo >= hi) && (!hf || e.data_custo <= hf);
+        if (hab && !ehData(e.data_custo)) av(e, "Sem data do custo válida: incremento de 20% não aplicado");
+        else if (hab && !dentro) av(e, "Data fora da vigência da habilitação 17.17/17.18: sem incremento de 20%");
+        if (dentro && base > 0) { v = r2(base * 1.2); ap = "Sim"; ob(e, "Incremento de 20% (habilitação 17.17/17.18)"); }
+      }
+      e.valor_sem_incremento = base; e.incremento_aplicado = ap; e.valor_tabela = v;
+    }
+    e.obs_regra = (OB.get(e.id) || []).join("; ");
+    e.aviso = (AV.get(e.id) || []).join(" | ");
+  });
+
+  /* 7. Medicamentos */
   state.meds.forEach(e => {
-    const r = precoBPS(e.codigo_catmat, e.unidade, e.uf, e.municipio);
+    const r = semCorr(e) ? null : precoBPS(e.codigo_catmat, e.unidade, e.uf, e.municipio);
     const it = DB.bps[bpsAtual()]?.byCat.get(e.codigo_catmat);
     e.medicamento = it?.ds_item ?? e.medicamento ?? "";
     e.base_bps = bpsAtual();
@@ -1416,15 +1688,24 @@ function recalcular(){
     e.valor_unitario = r?.mediana ?? null;
     const q = Number(e.quantidade) || 0;
     e.valor_total = r ? r.mediana * q : null;
-    e.aviso = !DB.bps[bpsAtual()]?.pronto ? "Base BPS não carregada" : !r ? "Sem registro de preço" : r.fraca ? `Base fraca: ${r.n_compras} ${r.n_compras == 1 ? "compra" : "compras"} (mínimo ${minCompras()})` : "";
-    if (e.data_retirada && state.procs.some(x => x.prontuario === e.prontuario && x.data_realizacao === e.data_retirada && ehQuimio(x.co_procedimento))) {
-      const a = "Mesmo dia de quimioterapia: se foi dado na sessão, não registre (já incluído na APAC)";
-      e.aviso = e.aviso ? e.aviso + " | " + a : a;
-    }
+    const L = [];
+    if (semCorr(e)) { e.valor_unitario = 0; e.valor_total = 0; L.push("Sem correspondência: fora do cálculo"); }
+    else L.push(!DB.bps[bpsAtual()]?.pronto ? "Base BPS não carregada" : !r ? "Sem registro de preço" : r.fraca ? `Base fraca: ${r.n_compras} ${r.n_compras == 1 ? "compra" : "compras"} (mínimo ${minCompras()})` : "");
+    if (!semCorr(e) && e.data_retirada && state.procs.some(x => x.prontuario === e.prontuario && x.data_realizacao === e.data_retirada && ehQuimio(x.co_procedimento)))
+      L.push("Mesmo dia de quimioterapia: se foi dado na sessão, não registre (já incluído na APAC)");
+    if (ehData(e.data_retirada) && e.data_retirada > hj) L.push("Data de retirada no futuro");
+    if (ehData(e.data_receita) && e.data_receita > hj) L.push("Data da receita no futuro");
+    if (ehData(e.data_retirada) && ehData(e.data_receita) && e.data_retirada < e.data_receita) L.push("Data de retirada anterior à da receita");
+    e.aviso = L.filter(Boolean).join(" | ");
   });
+
+  /* 8. Internações */
   state.ints.forEach(e => {
     e.n_procedimentos = state.procs.filter(p => p.prontuario === e.prontuario && p.aih_do_periodo === e.aih).length;
-    e.aviso = !e.data_entrada || !e.data_alta ? "Faltam datas" : e.data_alta < e.data_entrada ? "Alta antes da entrada" : "";
+    const L = [!e.data_entrada || !e.data_alta ? "Faltam datas" : e.data_alta < e.data_entrada ? "Alta antes da entrada" : ""];
+    if (ehData(e.data_entrada) && e.data_entrada > hj) L.push("Data de entrada no futuro");
+    if (ehData(e.data_alta) && e.data_alta > hj) L.push("Data de alta no futuro");
+    e.aviso = L.filter(Boolean).join(" | ");
   });
 }
 
@@ -1473,6 +1754,17 @@ function renderTudo(){
   renderRascunhos();
 }
 
+const ABERTAS = new Set();
+function detalheRevisao(l){
+  const cols = l.tipo === "proc" ? COLS.proc : COLS.med;
+  const itens = cols.map(c => { let v = l.e[c]; if (Array.isArray(v)) v = v.length ? v.join("; ") : "N"; return v === "" || v == null ? null : [c, typeof v === "number" ? (c.startsWith("valor") ? brl(v) : v) : v]; }).filter(Boolean);
+  return `<tr class="det"><td colspan="10"><div class="detgrid">${itens.map(([k, v]) => `<div><small>${esc(k)}</small>${esc(v)}</div>`).join("")}</div></td></tr>`;
+}
+document.addEventListener("click", e => {
+  const b = e.target.closest("[data-exp]"); if (!b) return;
+  const id = b.dataset.exp; if (ABERTAS.has(id)) ABERTAS.delete(id); else ABERTAS.add(id);
+  renderRevisao();
+});
 function renderRevisao(){
   const L = linhasRevisao();
   /* opções dos filtros */
@@ -1486,10 +1778,10 @@ function renderRevisao(){
   const vis = L.filter(l => (!f.pac || l.pac === f.pac) && (!f.tipo || l.tipo === f.tipo) && (!f.mes || (l.data || "").startsWith(f.mes))
     && (!f.aih || l.e.aih_do_periodo === f.aih || l.e.aih === f.aih) && (!f.sit || (l.e.situacao?.length ? l.e.situacao.includes(f.sit) : f.sit === "N")) && (!f.av || l.aviso));
   $("[data-rows=rev]").innerHTML = vis.length ? vis.map(l => `<tr${l.aviso ? ' class="warn"' : ""}>
-    <td>${esc(l.pac)}</td><td>${dataBR(l.data)}</td><td class="mono">${esc(l.cod)}</td><td class="wrap">${esc(l.desc)}</td><td>${esc(l.local)}</td>
-    <td>${esc(sit(l.e))}</td><td class="val" title="${l.tipo === "proc" ? "Valor de tabela: SA quando houver, senão total hospitalar, × quantidade (sem regras)" : "Mediana do BPS × quantidade (sem regras)"}">${brl(l.valor)}</td>
-    <td>${avisoCel(l.aviso)}</td><td>${btnExcluir(l.tipo === "proc" ? "procs" : "meds", l.e.id)}</td></tr>`).join("")
-    : vazio(9, L.length ? "Nenhuma entrada com estes filtros." : "Nenhuma entrada registrada ainda.");
+    <td><button class="linkbtn" data-exp="${esc(l.e.id)}" aria-label="Ver todos os campos">${ABERTAS.has(l.e.id) ? "▾" : "▸"}</button></td><td>${esc(l.pac)}</td><td>${dataBR(l.data)}</td><td class="mono">${esc(l.cod)}</td><td class="wrap">${esc(l.desc)}</td><td>${esc(l.local)}</td>
+    <td>${esc(sit(l.e))}</td><td class="val" title="${l.tipo === "proc" ? "Valor de tabela com as regras de custeio (APAC, AIH, situações e incremento)" : "Mediana do BPS × quantidade"}">${brl(l.valor)}</td>
+    <td>${avisoCel(l.aviso)}</td><td>${btnExcluir(l.tipo === "proc" ? "procs" : "meds", l.e.id)}</td></tr>${ABERTAS.has(l.e.id) ? detalheRevisao(l) : ""}`).join("")
+    : vazio(10, L.length ? "Nenhuma entrada com estes filtros." : "Nenhuma entrada registrada ainda.");
   /* estatísticas */
   $("#st-pac").textContent = new Set(L.map(l => l.pac)).size;
   $("#st-ent").textContent = L.length + state.ints.length;
@@ -1549,13 +1841,32 @@ document.addEventListener("click", e => {
    EXPORTAR .xlsx
    ===================================================================== */
 const COLS = {
-  proc: ["id","usuario","prontuario","codigo_paciente","origem_dado","data_realizacao","data_pedido","co_procedimento","no_procedimento","classificacao","quantidade","local_ato","aih_do_periodo","aih","tipo_aih","ordem_aih","apac","rt_inicio","rt_fim","rt_sessoes","situacao","doc","observacao_usuario","competencia","co_principal_opm","qtd_conferida_sigtap","nota_conferencia","vl_sa","vl_sh","vl_sp","vl_tot_hosp","valor_tabela","aviso","criado_em"],
+  proc: ["id","usuario","prontuario","codigo_paciente","origem_dado","data_realizacao","data_pedido","data_custo","co_procedimento","no_procedimento","classificacao","quantidade","local_ato","forma_cobranca","item_hospitalar","aih_do_periodo","aih","tipo_aih","ordem_aih","apac","rt_inicio","rt_fim","rt_sessoes","situacao","doc","observacao_usuario","competencia","co_principal_opm","qtd_conferida_sigtap","nota_conferencia","vl_sa","vl_sh","vl_sp","vl_tot_hosp","incremento_aplicado","valor_sem_incremento","valor_tabela","obs_regra","aviso","criado_em"],
   int:  ["id","usuario","prontuario","aih","tipo_aih","data_entrada","data_alta","motivo_saida","observacao_usuario","n_procedimentos","aviso","criado_em"],
   med:  ["id","usuario","prontuario","codigo_paciente","origem_dado","data_retirada","data_receita","codigo_catmat","medicamento","unidade","quantidade","uf","municipio","situacao","doc","observacao_usuario","base_bps","nivel_preco","n_compras","base_fraca","periodo_bps","valor_unitario","valor_total","aviso","criado_em"]
 };
+/* Células vazias: texto → "Não informado" ou "Não se aplica"; numérico → 0; data → data inexistente */
+const COL_NUM = new Set(["quantidade","ordem_aih","rt_sessoes","vl_sa","vl_sh","vl_sp","vl_tot_hosp","valor_sem_incremento","valor_tabela","n_compras","valor_unitario","valor_total","n_procedimentos"]);
+const COL_DATA = new Set(["data_realizacao","data_pedido","data_custo","rt_inicio","rt_fim","data_entrada","data_alta","data_retirada","data_receita"]);
+const COL_NSA = new Set(["aih","tipo_aih","aih_do_periodo","apac","co_principal_opm","qtd_conferida_sigtap","nota_conferencia","observacao_usuario","obs_regra","aviso","incremento_aplicado","nivel_preco","periodo_bps","base_fraca","municipio","forma_cobranca"]);
+const DATA_VAZIA = "0000-00-00", NAO_INFORMADO = "Não informado", NAO_SE_APLICA = "Não se aplica";
+const padrao = (c, v) => {
+  if (Array.isArray(v)) return v.length ? v.join("; ") : "N";
+  if (v !== "" && v != null) return v;
+  return COL_NUM.has(c) ? 0 : COL_DATA.has(c) ? DATA_VAZIA : COL_NSA.has(c) ? NAO_SE_APLICA : NAO_INFORMADO;
+};
+const desfazPadrao = (c, v) => {
+  if (v === NAO_INFORMADO || v === NAO_SE_APLICA) return "";
+  if (COL_DATA.has(c) && v === DATA_VAZIA) return "";
+  if (COL_NUM.has(c) && (v === 0 || v === "0")) return "";
+  return v;
+};
 function linhasPara(lista, cols, semPront){
-  return lista.map(e => Object.fromEntries(cols.filter(c => !(semPront && c === "prontuario")).map(c => [c, Array.isArray(e[c]) ? (e[c].length ? e[c].join("; ") : "N") : (e[c] ?? "")])));
+  return lista.map(e => Object.fromEntries(cols.filter(c => !(semPront && c === "prontuario")).map(c => [c, padrao(c, e[c])])));
 }
+const real = a => a && a !== NAO_SE_APLICA && a !== NAO_INFORMADO;
+const TEXTO_LIMITE = "O OncoCusto calcula o valor de tabela do SIGTAP (APAC, BPA e AIH) e o preço de medicamentos retirados fora de procedimentos, pelo BPS. Os antineoplásicos de quimioterapia estão dentro do valor da APAC. Medicamentos de compra centralizada pelo Ministério da Saúde e os do rol de altíssimo custo (Portaria Conjunta SCTIE/SAES/MS nº 2/2026) não são incluídos.";
+document.querySelectorAll("[data-limite]").forEach(el => el.textContent = TEXTO_LIMITE);
 $("#exp-baixar").addEventListener("click", () => {
   if (typeof XLSX === "undefined") { toast("A biblioteca de planilhas não carregou. Verifique a internet e recarregue a página.", true); return; }
   if (!state.projeto) { toast("Crie o projeto primeiro.", true); return; }
@@ -1566,27 +1877,39 @@ $("#exp-baixar").addEventListener("click", () => {
   add("Internações", linhasPara(state.ints, COLS.int, semPront), COLS.int);
   add("Medicamentos", linhasPara(state.meds, COLS.med, semPront), COLS.med);
   /* Resumo por paciente */
+  const fc = fatorCorrecao();
   const pacs = [...new Set([...state.procs, ...state.meds, ...state.ints].map(e => e.prontuario))].sort();
+  const linhaResumo = (P, M, ident) => {
+    const tp = P.reduce((s, e) => s + (e.valor_tabela || 0), 0), tm = M.reduce((s, e) => s + (e.valor_total || 0), 0);
+    const H = P.filter(e => e.item_hospitalar === "Sim"), th = H.reduce((s, e) => s + (e.valor_tabela || 0), 0);
+    const hosp = H.length > 0;
+    return { ...ident, n_registros: P.length + M.length, n_sem_correspondencia: P.filter(semCorr).length + M.filter(semCorr).length,
+      total_procedimentos_tabela: +tp.toFixed(2), total_medicamentos: +tm.toFixed(2), total_caso_base: +(tp + tm).toFixed(2),
+      total_sem_incremento: +(P.reduce((s, e) => s + (e.valor_sem_incremento || 0), 0) + tm).toFixed(2),
+      total_sem_base_fraca: +(tp + M.filter(e => e.base_fraca !== "Sim").reduce((s, e) => s + (e.valor_total || 0), 0)).toFixed(2),
+      valor_hospitalar_tabela: hosp ? +th.toFixed(2) : NAO_SE_APLICA,
+      fator_correcao_hospitalar: hosp ? fc : NAO_SE_APLICA,
+      valor_hospitalar_corrigido: hosp ? +(th * fc).toFixed(2) : NAO_SE_APLICA,
+      total_com_fator_correcao: hosp ? +(tp - th + th * fc + tm).toFixed(2) : NAO_SE_APLICA };
+  };
   const resumo = pacs.map((pr, i) => {
     const P = state.procs.filter(e => e.prontuario === pr), M = state.meds.filter(e => e.prontuario === pr);
     const cod = (P[0] || M[0])?.codigo_paciente || "";
-    const tp = P.reduce((s, e) => s + (e.valor_tabela || 0), 0), tm = M.reduce((s, e) => s + (e.valor_total || 0), 0);
-    const th = P.filter(e => e.local_ato === "Hospitalar").reduce((s, e) => s + (e.valor_tabela || 0), 0);
-    const fc = fatorCorrecao();
-    return { ...(semPront ? { paciente: cod || `Paciente ${i + 1}` } : { prontuario: pr, codigo_paciente: cod }), n_registros: P.length + M.length,
-      total_procedimentos_tabela: +tp.toFixed(2), total_medicamentos: +tm.toFixed(2), total_geral_sem_regras: +(tp + tm).toFixed(2),
-      fator_correcao_hospitalar: fc, total_com_fator_correcao: +(tp - th + th * fc + tm).toFixed(2) };
+    return linhaResumo(P, M, semPront ? { paciente: cod || `Paciente ${i + 1}` } : { prontuario: pr, codigo_paciente: cod });
   });
-  add("Resumo", resumo, ["prontuario","n_registros","total_geral_sem_regras"]);
+  if (pacs.length) resumo.push(linhaResumo(state.procs, state.meds, semPront ? { paciente: "TOTAL" } : { prontuario: "TOTAL", codigo_paciente: NAO_SE_APLICA }));
+  add("Resumo", resumo, ["prontuario","n_registros","total_caso_base"]);
   const avisos = [...state.procs.map(e => ({ aba: "Procedimentos", id: e.id, item: e.co_procedimento, aviso: e.aviso || e.nota_conferencia })),
                   ...state.ints.map(e => ({ aba: "Internações", id: e.id, item: e.aih, aviso: e.aviso })),
                   ...state.meds.map(e => ({ aba: "Medicamentos", id: e.id, item: e.codigo_catmat, aviso: e.aviso }))].filter(a => a.aviso);
   add("Avisos", avisos, ["aba","id","item","aviso"]);
-  const lim = [...state.procs.filter(e => e.valor_tabela == null).map(e => ({ aba: "Procedimentos", id: e.id, item: e.co_procedimento, motivo: e.aviso || "Sem valor" })),
-               ...state.meds.filter(e => e.valor_total == null).map(e => ({ aba: "Medicamentos", id: e.id, item: e.codigo_catmat, motivo: e.aviso || "Sem preço" }))];
+  const lim = [{ aba: "Geral", id: NAO_SE_APLICA, item: NAO_SE_APLICA, motivo: TEXTO_LIMITE },
+               ...state.procs.filter(e => semCorr(e) || e.valor_tabela == null).map(e => ({ aba: "Procedimentos", id: e.id, item: e.co_procedimento, motivo: semCorr(e) ? "Sem correspondência: fora do cálculo" : (e.aviso || "Sem valor") })),
+               ...state.meds.filter(e => semCorr(e) || e.valor_total == null).map(e => ({ aba: "Medicamentos", id: e.id, item: e.codigo_catmat, motivo: semCorr(e) ? "Sem correspondência: fora do cálculo" : (e.aviso || "Sem preço") }))];
   add("Limitações", lim, ["aba","id","item","motivo"]);
-  const params = Object.entries(state.projeto).map(([chave, valor]) => ({ chave, valor: typeof valor === "boolean" ? (valor ? "Sim" : "Não") : valor }));
-  params.push({ chave: "versao_site", valor: CONFIG.versaoSite }, { chave: "exportado_em", valor: new Date().toISOString() }, { chave: "versao_arquivo", valor: semPront ? "Sem prontuário" : "Completa" });
+  const params = Object.entries(state.projeto).filter(([k]) => !["sa_sh","rt_data","fora_aih","permanencia"].includes(k)).map(([chave, valor]) => ({ chave, valor: typeof valor === "boolean" ? (valor ? "Sim" : "Não") : (valor === "" || valor == null ? NAO_INFORMADO : valor) }));
+  params.push({ chave: "versao_site", valor: String(CONFIG.versaoSite) }, { chave: "exportado_em", valor: agoraBR() }, { chave: "fuso_horario", valor: "America/Sao_Paulo (horário de Brasília)" }, { chave: "formato_data_hora", valor: "DD-MM-AAAA HH:MM:SS" },
+              { chave: "celulas_vazias", valor: `texto: "${NAO_INFORMADO}" ou "${NAO_SE_APLICA}"; numérico: 0; data: ${DATA_VAZIA}` }, { chave: "versao_arquivo", valor: semPront ? "Sem prontuário" : "Completa" });
   add("Parâmetros", params, ["chave","valor"]);
   XLSX.writeFile(wb, $("#exp-nome").textContent);
   toast("Planilha gerada.");
@@ -1605,13 +1928,14 @@ async function lerPlanilha(file){
     const par = aba("Parâmetros");
     if (!par) throw new Error("o arquivo não tem a aba Parâmetros");
     const projeto = {};
-    par.forEach(r => { if (!["versao_site","exportado_em","versao_arquivo"].includes(r.chave)) projeto[r.chave] = r.valor === "Sim" ? true : r.valor === "Não" ? false : r.valor; });
-    const sitArr = r => { r.situacao = r.situacao && r.situacao !== "N" ? String(r.situacao).split(/;\s*/) : []; return r; };
-    importado = { projeto, procs: (aba("Procedimentos") || []).map(sitArr), ints: aba("Internações") || [], meds: (aba("Medicamentos") || []).map(sitArr) };
+    par.forEach(r => { if (!["versao_site","exportado_em","versao_arquivo","fuso_horario","formato_data_hora","celulas_vazias","sa_sh","rt_data","fora_aih","permanencia"].includes(r.chave)) projeto[r.chave] = r.valor === "Sim" ? true : r.valor === "Não" ? false : desfazPadrao("", r.valor); });
+    const limpa = r => { Object.keys(r).forEach(k => { r[k] = desfazPadrao(k, r[k]); }); return r; };
+    const sitArr = r => { limpa(r); r.situacao = r.situacao && r.situacao !== "N" ? String(r.situacao).split(/;\s*/) : []; return r; };
+    importado = { projeto, procs: (aba("Procedimentos") || []).map(sitArr), ints: (aba("Internações") || []).map(limpa), meds: (aba("Medicamentos") || []).map(sitArr) };
     const semPront = par.find(r => r.chave === "versao_arquivo")?.valor === "Sem prontuário";
     const exp = par.find(r => r.chave === "exportado_em")?.valor;
     $("#abrir-nome").textContent = file.name;
-    $("#abrir-meta").textContent = `Exportado em ${exp ? new Date(exp).toLocaleString("pt-BR") : "—"} · por ${projeto.usuario || "—"}`;
+    $("#abrir-meta").textContent = `Exportado em ${exp || "—"} (horário de Brasília) · por ${projeto.usuario || "—"}`;
     $("#abrir-status").textContent = semPront ? "Versão sem prontuário" : "Arquivo válido";
     $("#abrir-status").classList.toggle("w", semPront);
     $("#abrir-pac").textContent = new Set([...importado.procs, ...importado.meds].map(e => e.prontuario)).size;

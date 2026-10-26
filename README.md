@@ -8,6 +8,8 @@ O OncoCusto transforma o registro assistencial (procedimentos, internações e m
 
 > O resultado é o valor de tabela (repasse federal), não o custo de produção do hospital.
 
+> **Limitação.** O OncoCusto calcula o valor de tabela do SIGTAP (APAC, BPA e AIH) e o preço de medicamentos retirados fora de procedimentos, pelo BPS. Os antineoplásicos de quimioterapia estão dentro do valor da APAC. Medicamentos de compra centralizada pelo Ministério da Saúde e os do rol de altíssimo custo (Portaria Conjunta SCTIE/SAES/MS nº 2/2026) não são incluídos.
+
 ---
 
 ## Privacidade: nenhum dado de paciente sai do computador
@@ -33,10 +35,11 @@ Para conferir: abra as ferramentas do desenvolvedor (F12) › aba *Rede* e regis
 
 1. **Projeto:** identificação do estudo, usuário da sessão e decisões metodológicas (competência do SIGTAP, base do BPS, mínimo de compras, habilitação 17.17/17.18 etc.).
 2. **Internações:** uma linha por AIH, com entrada e alta. As datas definem o local do ato (ambulatorial ou hospitalar).
-3. **Procedimentos:** exames, consultas, cirurgias, quimioterapia, radioterapia, diárias e OPM, com conferência de OPM contra a cirurgia.
+3. **Procedimentos:** exames, consultas, cirurgias, quimioterapia, radioterapia, diárias e OPM, com conferência de OPM contra a cirurgia e as regras de custeio (APAC mensal, secundários, radioterapia, AIH sequenciais, incremento de 20%, situações). Códigos sem correspondência: 00.00.00.000-0 (procedimento) e 000000 (medicamento).
 4. **Medicamentos:** retiradas fora de procedimentos, com a mediana do BPS (município → UF → região → Brasil; mínimo de 3 compras, plano B de 1 compra marcado como "base fraca").
 5. **Revisão:** todas as entradas, filtros e avisos pendentes.
-6. **Exportar:** planilha completa ou **sem prontuário** (para compartilhar).
+6. **Exportar:** planilha completa ou **sem prontuário** (para compartilhar). Células vazias saem como "Não informado"/"Não se aplica" (texto), 0 (número) ou 0000-00-00 (data); datas e horas de criação e exportação seguem o horário de Brasília (DD-MM-AAAA HH:MM:SS).
+7. **Ajuda:** conferência no SIGTAP, o que é o id da planilha, limitações e contato.
 
 A planilha exportada tem as abas Procedimentos, Internações, Medicamentos, Resumo, Avisos, Limitações e Parâmetros, e pode ser reaberta no site para continuar o projeto em outro computador.
 
