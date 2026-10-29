@@ -41,7 +41,7 @@ Para conferir: abra as ferramentas do desenvolvedor (F12) › aba *Rede* e regis
 6. **Exportar:** planilha completa ou **sem prontuário** (para compartilhar). Células vazias saem como "Não informado"/"Não se aplica" (texto), 0 (número) ou 0000-00-00 (data); datas e horas de criação e exportação seguem o horário de Brasília (DD-MM-AAAA HH:MM:SS).
 7. **Ajuda:** conferência no SIGTAP, o que é o id da planilha, limitações e contato.
 
-A planilha exportada tem as abas Procedimentos, Internações, Medicamentos, Resumo, Avisos, Limitações e Parâmetros, e pode ser reaberta no site para continuar o projeto em outro computador.
+A planilha exportada tem as abas Procedimentos, Internações, Medicamentos, Resumo, Avisos, Limitações, Parâmetros e Dicionário (significado, tipo, origem e regra de cada variável de cada aba), e pode ser reaberta no site para continuar o projeto em outro computador.
 
 O passo a passo completo está no **Manual de apresentação e uso do site**; as regras de cálculo, no **Manual de regras de custeio do app**.
 
@@ -68,3 +68,13 @@ Fontes das bases: [SIGTAP/DATASUS](http://sigtap.datasus.gov.br), [Banco de Pre�
 ## Autoria
 
 Idealização, propriedade e manutenção: [Isabela Santos](https://github.com/isabelagsantos).
+
+## Aviso de novidades
+
+No fim da página aparece um quadro com o que mudou na versão. Ele some sozinho 1 mês depois da data `publicadoEm`. A cada publicação, atualize `publicadoEm` e `novidades` no bloco `CONFIG` do `index.html`.
+
+Procedimentos secundários sem principal compatível no mês (quimioterapia, hormonioterapia e radioterapia) não são cobrados: o valor fica zerado e o site avisa.
+
+## Juntar planilhas da equipe
+
+Na tela *Juntar planilhas da equipe*, escolha dois ou mais .xlsx exportados por usuários do mesmo projeto. O site une só os arquivos com o mesmo nome de uso, reduz a um os registros com o mesmo `id` (vale o do arquivo exportado por último), avisa quando as decisões do projeto diferem e quando há possíveis duplicidades entre usuários, e recalcula tudo. Planilhas na versão sem prontuário não podem ser unidas.

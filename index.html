@@ -263,6 +263,7 @@ td.empty-row{text-align:center;color:var(--muted);padding:22px}
 .toast.on{opacity:1;transform:translateX(-50%)}
 .toast.err{background:var(--accent);color:#fff}
 
+#novidades{max-width:1180px;margin:0 auto 24px;padding:10px 14px;border:1px solid var(--line);border-left:4px solid var(--accent,#2b6cb0);border-radius:6px;font-size:13px}
 footer{max-width:1180px;margin:0 auto;padding:18px 16px 32px;color:var(--muted);font-size:12px;border-top:1px solid var(--line);display:flex;flex-wrap:wrap;gap:6px 18px}
 
 /* Celular */
@@ -416,29 +417,38 @@ footer{max-width:1180px;margin:0 auto;padding:18px 16px 32px;color:var(--muted);
     <!-- ================= JUNTAR PLANILHAS ================= -->
     <section class="view" id="v-juntar">
       <button class="back" data-v="inicio">← Voltar ao início</button>
-      <div class="page-head"><div><div class="eyebrow">Trabalho em equipe</div><h1>Juntar planilhas da equipe</h1><p>Escolha os .xlsx de cada usuário. Só arquivos com o mesmo nome de uso são unidos.</p></div></div>
-      <div class="note"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v5M12 16h.01"/></svg><div>Esta tela ainda é um protótipo: a junção de planilhas entra junto com as regras.</div></div>
+      <div class="page-head"><div><div class="eyebrow">Trabalho em equipe</div><h1>Juntar planilhas da equipe</h1><p>Escolha os .xlsx exportados por cada usuário. Só arquivos com o mesmo nome de uso são unidos.</p></div></div>
+      <div class="note"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v5M12 16h.01"/></svg><div>A junção usa o <b>id</b> de cada registro: o mesmo registro em dois arquivos vira um só (vale o do arquivo exportado por último). Planilhas na <b>versão sem prontuário</b> não podem ser unidas. Depois de juntar, o site recalcula tudo com os parâmetros do arquivo mais recente.</div></div>
 
-      <div class="panel">
+      <div class="panel" id="juntar-pick">
         <div class="body">
-          <div class="drop" data-demo="juntar">
+          <div class="drop" data-pick="juntar">
             <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 16V4M7 9l5-5 5 5M4 20h16"/></svg>
             <b>Arraste os arquivos aqui ou clique para escolher</b>
             <span>Dois ou mais arquivos .xlsx do mesmo projeto</span>
           </div>
+          <input type="file" id="juntar-file" accept=".xlsx" multiple hidden>
         </div>
       </div>
 
       <div class="hidden" id="juntar-res">
         <div class="panel">
-          <h2>Arquivos <small>· 3 selecionados</small></h2>
-          <div class="body">
-            <div class="file"><span class="fic">XLSX</span><div><b>arquivo_usuario_1.xlsx</b><small>Usuário: — · nome de uso: —</small></div><span class="status">Mesmo projeto</span></div>
-            <div class="file"><span class="fic">XLSX</span><div><b>arquivo_usuario_2.xlsx</b><small>Usuário: — · nome de uso: —</small></div><span class="status">Mesmo projeto</span></div>
-            <div class="file"><span class="fic">XLSX</span><div><b>arquivo_usuario_3.xlsx</b><small>Usuário: — · nome de uso: —</small></div><span class="status w">Outro projeto</span></div>
-          </div>
+          <h2>Arquivos <small id="juntar-qtd">· 0 selecionados</small></h2>
+          <div class="body" id="juntar-lista"></div>
         </div>
-        <div class="form-foot"><button class="btn" data-reset="juntar">Trocar arquivos</button></div>
+        <div class="panel">
+          <h2>Resultado da junção</h2>
+          <div class="body">
+            <div class="stats">
+              <div class="stat"><small>Pacientes</small><strong id="juntar-pac">—</strong></div>
+              <div class="stat"><small>Procedimentos</small><strong id="juntar-proc">—</strong></div>
+              <div class="stat"><small>Internações</small><strong id="juntar-int">—</strong></div>
+              <div class="stat"><small>Medicamentos</small><strong id="juntar-med">—</strong></div>
+            </div>
+          </div>
+          <div class="body" style="padding-top:0"><div class="info" id="juntar-info">ℹ —</div></div>
+        </div>
+        <div class="form-foot"><button class="btn" data-reset="juntar">Trocar arquivos</button><button class="btn pri" id="juntar-ok" disabled>Juntar e abrir projeto</button></div>
       </div>
     </section>
 
@@ -491,7 +501,6 @@ footer{max-width:1180px;margin:0 auto;padding:18px 16px 32px;color:var(--muted);
             </div>
             <div class="tip" style="grid-column:1/-1">O <b>CNES</b> (Cadastro Nacional de Estabelecimentos de Saúde) é o número que identifica o hospital no SUS. Nele também aparecem as habilitações do serviço. Consulte o da sua instituição em <a href="https://cnes.datasus.gov.br/" target="_blank" rel="noopener">cnes.datasus.gov.br</a>.</div>
           </div>
-          <div class="param"><div><b>Fator estimulador de colônias</b><span>Padrão oficial: uma vez por mês (Manual de Oncologia, p. 71). “Por aplicação” não tem base oficial e serve só como cenário</span></div><div class="seg" data-k="fec"><button class="on">Uma por mês</button><button>Por aplicação</button></div></div>
           <div class="param"><div><b>Fator de correção do SIGTAP <button type="button" class="qm" aria-label="Sobre o fator de correção">?</button></b><span>Só para o cenário do Resumo · padrão 2,8</span></div><input type="text" data-k="fator" placeholder="2,8">
             <div class="tip" style="grid-column:1/-1">A Diretriz Metodológica de Avaliação Econômica (3ª ed., itens XLVI e XLVII) explica que a tabela SIGTAP traz só o repasse federal e cita um fator próximo de <b>2,8</b> para os <b>procedimentos hospitalares</b>, a partir das Contas do SUS. Ela não fixa fator para procedimentos ambulatoriais nem para medicamentos. Por isso o site multiplica por esse fator só o que foi feito em internação, numa coluna separada do Resumo (<b>total_com_fator_correcao</b>), que sai sempre. O caso-base continua com o valor da tabela. Deixe em branco para usar 2,8.</div></div>
         </div>
@@ -704,7 +713,7 @@ footer{max-width:1180px;margin:0 auto;padding:18px 16px 32px;color:var(--muted);
 
     <!-- ================= EXPORTAR ================= -->
     <section class="view" id="v-exportar">
-      <div class="page-head"><div><div class="eyebrow">Etapa 6</div><h1>Exportar</h1><p>Gera um arquivo .xlsx com todas as entradas, os resultados e os parâmetros.</p></div></div>
+      <div class="page-head"><div><div class="eyebrow">Etapa 6</div><h1>Exportar</h1><p>Gera um arquivo .xlsx com todas as entradas, os resultados, os parâmetros e o dicionário de variáveis.</p></div></div>
 
       <div class="panel">
         <h2>Arquivo</h2>
@@ -724,6 +733,7 @@ footer{max-width:1180px;margin:0 auto;padding:18px 16px 32px;color:var(--muted);
           <div class="sheet"><b>Avisos</b><span>Validações pendentes</span></div>
           <div class="sheet"><b>Limitações</b><span>Itens sem código ou preço</span></div>
           <div class="sheet"><b>Parâmetros</b><span>Decisões e versões</span></div>
+          <div class="sheet"><b>Dicionário</b><span>Significado de cada variável</span></div>
         </div>
         <div class="form-foot"><button class="btn" data-v="abrir">Importar .xlsx</button><button class="btn" data-v="juntar">Juntar planilhas</button><button class="btn pri" id="exp-baixar">Baixar .xlsx</button></div>
       </div>
@@ -769,6 +779,7 @@ footer{max-width:1180px;margin:0 auto;padding:18px 16px 32px;color:var(--muted);
   <span>Site estático · cálculo no navegador</span>
   <span id="ft-sigtap">SIGTAP —</span><span id="ft-bps">BPS —</span><span id="ft-versao">Versão do site —</span>
 </footer>
+<div id="novidades" hidden></div>
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
@@ -786,8 +797,10 @@ footer{max-width:1180px;margin:0 auto;padding:18px 16px 32px;color:var(--muted);
 const MANUTENCAO = { ativo: false, inicio: "2026-10-20", dias_uteis: 5 };
 
 const CONFIG = {
-  versaoSite: "0.5",
-  versaoNotas: "regras de custeio de APAC e AIH, incremento de 20%, códigos sem correspondência, horário de Brasília e Ajuda ampliada",
+  versaoSite: "0.6",
+  /* Aviso de novidades no fim da página: some sozinho 1 mês depois de publicadoEm (AAAA-MM-DD). Ao publicar uma nova versão, atualize as duas linhas. */
+  publicadoEm: "2026-10-28",
+  novidades: "A planilha exportada agora inclui a aba Dicionário, com o significado de cada variável. Procedimentos secundários sem principal compatível no mês deixam de ser cobrados (com aviso). A tela Juntar planilhas da equipe agora funciona.",
   pastas: ["dados/", ""],               // procura primeiro em dados/, depois na raiz do repositório
   sigtap: {
     "10/2026": { proc: "sigtap_procedimentos_10_2026.json", compat: "sigtap_compatibilidade_10_2026.json" },
@@ -1085,8 +1098,15 @@ function renderCabecalho(){
   $("#ft-sigtap").textContent = `SIGTAP ${compAtual()}`;
   const b = DB.bps[bpsAtual()];
   $("#ft-bps").textContent = `BPS ${bpsAtual()}${b?.periodo ? " (" + b.periodo + ")" : ""}`;
-  $("#ft-versao").textContent = `Versão do site ${CONFIG.versaoSite} · ${CONFIG.versaoNotas}`;
-  const cv = $("#contato-versao"); if (cv) cv.textContent = `Versão do site: ${CONFIG.versaoSite} (${CONFIG.versaoNotas}).`;
+  try {
+    const lim = new Date(CONFIG.publicadoEm + "T00:00:00"); lim.setMonth(lim.getMonth() + 1);
+    if (CONFIG.novidades && hoje() <= lim.toLocaleDateString("sv-SE")) {
+      const nv = $("#novidades"); nv.innerHTML = ""; const b = document.createElement("b"); b.textContent = `Novidades da versão ${CONFIG.versaoSite}: `;
+      nv.append(b, CONFIG.novidades); nv.hidden = false;
+    }
+  } catch (e) {}
+  $("#ft-versao").textContent = `Versão do site ${CONFIG.versaoSite}`;
+  const cv = $("#contato-versao"); if (cv) cv.textContent = `Versão do site: ${CONFIG.versaoSite}.`;
   mostrarManutencao();
   $("#proc-comp-lbl").textContent = `· SIGTAP ${compAtual()}`;
   $("#med-bps-lbl").textContent = `· BPS ${bpsAtual()}`;
@@ -1526,13 +1546,12 @@ function recalcular(){
       const p = PX.get(e.id);
       const pares = pri.flatMap(pr => compSec(pr, e).map(r => ({ pr, r })));
       const limite = pares.length ? (Math.max(...pares.map(x => x.r.qtd || 0)) || p.qtd_max || 1) : (p.qtd_max || 1);
-      if (!pares.length) av(e, "Secundário sem principal compatível no mês");
+      if (!pares.length) av(e, "Secundário sem principal compatível no mês: não cobrado (Manual de Bases Técnicas da Oncologia)");
       else if (e.apac && !pares.some(x => !x.pr.apac || x.pr.apac === e.apac)) av(e, "Secundário em APAC diferente da do principal compatível");
       const q = Number(e.quantidade) || 1, u = usados.get(e.co_procedimento) || 0;
-      const porAplic = e.co_procedimento === "0304080012" && state.projeto?.fec === "Por aplicação";
-      const perm = porAplic ? q : Math.max(0, Math.min(q, limite - u));
+      const perm = pares.length ? Math.max(0, Math.min(q, limite - u)) : 0;
       usados.set(e.co_procedimento, u + perm);
-      if (perm < q) av(e, `Quantidade acima do permitido no mês (limite do par: ${limite}): cobrado até o limite`);
+      if (pares.length && perm < q) av(e, `Quantidade acima do permitido no mês (limite do par: ${limite}): cobrado até o limite`);
       set(e, r2((p.vl_sa || 0) * perm), "APAC", false);
     });
   });
@@ -1559,11 +1578,11 @@ function recalcular(){
     const p = PX.get(e.id);
     const pares = rtPri.filter(x => x.prontuario === e.prontuario && ((x.apac && e.apac && x.apac === e.apac) || mesDe(x) === mesDe(e))).flatMap(pr => compSec(pr, e));
     const limite = pares.length ? (Math.max(...pares.map(r => r.qtd || 0)) || p.qtd_max || 1) : (p.qtd_max || 1);
-    if (!pares.length) av(e, "Secundário sem principal compatível no mês");
+    if (!pares.length) av(e, "Secundário sem principal compatível no mês: não cobrado (Manual de Bases Técnicas da Oncologia)");
     const k = e.prontuario + "|" + e.co_procedimento + "|" + mesDe(e);
-    const q = Number(e.quantidade) || 1, u = usadosRT.get(k) || 0, perm = Math.max(0, Math.min(q, limite - u));
+    const q = Number(e.quantidade) || 1, u = usadosRT.get(k) || 0, perm = pares.length ? Math.max(0, Math.min(q, limite - u)) : 0;
     usadosRT.set(k, u + perm);
-    if (perm < q) av(e, `Quantidade acima do permitido (limite do par: ${limite}): cobrado até o limite`);
+    if (pares.length && perm < q) av(e, `Quantidade acima do permitido (limite do par: ${limite}): cobrado até o limite`);
     set(e, r2((p.vl_sa || 0) * perm), "APAC", false);
   });
 
@@ -1867,6 +1886,152 @@ function linhasPara(lista, cols, semPront){
 const real = a => a && a !== NAO_SE_APLICA && a !== NAO_INFORMADO;
 const TEXTO_LIMITE = "O OncoCusto calcula o valor de tabela do SIGTAP (APAC, BPA e AIH) e o preço de medicamentos retirados fora de procedimentos, pelo BPS. Os antineoplásicos de quimioterapia estão dentro do valor da APAC. Medicamentos de compra centralizada pelo Ministério da Saúde e os do rol de altíssimo custo (Portaria Conjunta SCTIE/SAES/MS nº 2/2026) não são incluídos.";
 document.querySelectorAll("[data-limite]").forEach(el => el.textContent = TEXTO_LIMITE);
+/* Dicionário de variáveis: uma linha por variável de cada aba da planilha */
+const D = (aba, variavel, descricao, tipo, origem, valores) => ({ aba, variavel, descricao, tipo, origem, valores_ou_regra: valores || NAO_SE_APLICA });
+const T = "Texto", N = "Número", DT = "Data (AAAA-MM-DD)", DH = "Data e hora (DD-MM-AAAA HH:MM:SS)", L = "Lista", SN = "Sim/Não";
+const DIGITADO = "Digitado pelo usuário", AUTO = "Calculado pelo site", SIG = "SIGTAP", BPSF = "BPS";
+const PADRAO_VAZIO = "Vazio sai como Não informado ou Não se aplica";
+const DICIONARIO = [
+  /* Procedimentos */
+  D("Procedimentos","id","Identificador interno único do registro; liga Avisos e Limitações ao registro. Não editar.",T,AUTO,"Código gerado no salvamento"),
+  D("Procedimentos","usuario","Usuário da sessão que registrou.",T,DIGITADO,"Definido na tela Projeto"),
+  D("Procedimentos","prontuario","Número do prontuário do paciente (some na versão sem prontuário).",T,DIGITADO),
+  D("Procedimentos","codigo_paciente","Código do paciente usado no estudo.",T,DIGITADO,"Pode ser \"Sem código\""),
+  D("Procedimentos","origem_dado","Fonte do dado registrado.",L,DIGITADO,"Prontuário, Laudo de exame, Ambos, Outra"),
+  D("Procedimentos","data_realizacao","Data em que o procedimento foi realizado (não a do pedido).",DT,DIGITADO,"Pode ser \"Data não informada\""),
+  D("Procedimentos","data_pedido","Data do pedido do procedimento.",DT,DIGITADO,"Pode ser \"Data não informada\""),
+  D("Procedimentos","data_custo","Data em que o custo é contado: igual à de realização, exceto radioterapia (data de término).",DT,AUTO),
+  D("Procedimentos","co_procedimento","Código SIGTAP de 10 dígitos (0000000000 = sem correspondência).",T,DIGITADO,"Escolhido na busca"),
+  D("Procedimentos","no_procedimento","Nome do procedimento na competência do SIGTAP.",T,SIG),
+  D("Procedimentos","classificacao","Classificação do registro no SIGTAP (procedimento, medicamento, exame etc.).",T,SIG),
+  D("Procedimentos","quantidade","Quantidade realizada.",N,DIGITADO,"Inteiro maior ou igual a 1"),
+  D("Procedimentos","local_ato","Local do ato: hospitalar se a data cai entre entrada e alta de uma internação do prontuário; senão ambulatorial.",L,AUTO,"Hospitalar, Ambulatorial"),
+  D("Procedimentos","forma_cobranca","Instrumento usado no cálculo do valor.",L,AUTO,"APAC, AIH, Ambulatorial, AIH (sem internação cadastrada), Fora do cálculo"),
+  D("Procedimentos","item_hospitalar","Indica se o item entra no valor hospitalar do cenário do fator de correção.",SN,AUTO),
+  D("Procedimentos","aih_do_periodo","Nº da AIH da internação que contém a data de realização.",T,AUTO),
+  D("Procedimentos","aih","Nº da AIH informado pelo usuário para vincular o registro.",T,DIGITADO,"Lista das internações cadastradas"),
+  D("Procedimentos","tipo_aih","Tipo de AIH informado no registro.",L,DIGITADO,"Comum, Sequenciais em oncologia (04.15.02.005-0), Cirurgias múltiplas (04.15.01.001-2), Outras sequenciais (04.15.02.003-4), Outro tipo"),
+  D("Procedimentos","ordem_aih","Posição do procedimento na AIH de sequenciais ou múltiplas.",N,DIGITADO,"Inteiro a partir de 1"),
+  D("Procedimentos","apac","Nº ou data da APAC (opcional); agrupa registros da mesma APAC.",T,DIGITADO),
+  D("Procedimentos","rt_inicio","Início do tratamento de radioterapia.",DT,DIGITADO),
+  D("Procedimentos","rt_fim","Término do tratamento de radioterapia; vira a data do custo.",DT,DIGITADO),
+  D("Procedimentos","rt_sessoes","Número de sessões de radioterapia.",N,DIGITADO),
+  D("Procedimentos","situacao","Situações padrão do registro; sem escolha vale N. Múltiplas separadas por ponto e vírgula.",L,DIGITADO,"N, AP, IA, AE, D, DP, DE, FI, NC, RP, SC, SS"),
+  D("Procedimentos","doc","Documento de origem; \"Não necessário\" quando não há.",T,DIGITADO),
+  D("Procedimentos","observacao_usuario","Observação livre do pesquisador; obrigatória para código sem correspondência.",T,DIGITADO),
+  D("Procedimentos","competencia","Competência do SIGTAP usada no cálculo.",T,AUTO,"MM/AAAA"),
+  D("Procedimentos","co_principal_opm","Código do procedimento principal ao qual o OPM está vinculado.",T,DIGITADO,"Só para OPM (grupo 07)"),
+  D("Procedimentos","qtd_conferida_sigtap","Quantidade do par principal × OPM conferida manualmente no SIGTAP.",N,DIGITADO,"Só para OPM"),
+  D("Procedimentos","nota_conferencia","Nota automática da conferência de OPM.",T,AUTO),
+  D("Procedimentos","vl_sa","Valor de serviço ambulatorial (SA) unitário no SIGTAP, em reais.",N,SIG),
+  D("Procedimentos","vl_sh","Valor de serviço hospitalar (SH) unitário no SIGTAP, em reais.",N,SIG),
+  D("Procedimentos","vl_sp","Valor de serviço profissional (SP) unitário no SIGTAP, em reais.",N,SIG),
+  D("Procedimentos","vl_tot_hosp","Total hospitalar (SH + SP) unitário no SIGTAP, em reais.",N,SIG),
+  D("Procedimentos","incremento_aplicado","Se o incremento de 20% (habilitação 17.17/17.18) foi aplicado ao valor.",L,AUTO,"Sim, Não, Não se aplica"),
+  D("Procedimentos","valor_sem_incremento","Valor do registro antes do incremento de 20%, em reais.",N,AUTO),
+  D("Procedimentos","valor_tabela","Valor final do registro pelo SIGTAP, com todas as regras de custeio, em reais.",N,AUTO,"Caso-base"),
+  D("Procedimentos","obs_regra","Observações automáticas das regras (por exemplo, Incluído na AIH).",T,AUTO),
+  D("Procedimentos","aviso","Avisos de conferência do registro, separados por barra vertical.",T,AUTO),
+  D("Procedimentos","criado_em","Data e hora do registro, no horário de Brasília.",DH,AUTO),
+  /* Internações */
+  D("Internações","id","Identificador interno único da internação.",T,AUTO),
+  D("Internações","usuario","Usuário da sessão que cadastrou.",T,DIGITADO),
+  D("Internações","prontuario","Número do prontuário.",T,DIGITADO),
+  D("Internações","aih","Nº da AIH.",T,DIGITADO),
+  D("Internações","tipo_aih","Tipo de AIH; define as regras de sequenciais e múltiplas.",L,DIGITADO,"Comum, Sequenciais em oncologia (04.15.02.005-0), Cirurgias múltiplas (04.15.01.001-2), Outras sequenciais (04.15.02.003-4), Outro tipo"),
+  D("Internações","data_entrada","Data de entrada na internação.",DT,DIGITADO),
+  D("Internações","data_alta","Data de alta (ou de saída).",DT,DIGITADO),
+  D("Internações","motivo_saida","Motivo de saída.",L,DIGITADO,"Alta, Transferência, Óbito, Permanência"),
+  D("Internações","observacao_usuario","Observação livre.",T,DIGITADO),
+  D("Internações","n_procedimentos","Quantidade de procedimentos cuja data cai na internação.",N,AUTO),
+  D("Internações","aviso","Avisos da internação.",T,AUTO),
+  D("Internações","criado_em","Data e hora do cadastro, no horário de Brasília.",DH,AUTO),
+  /* Medicamentos */
+  D("Medicamentos","id","Identificador interno único do registro.",T,AUTO),
+  D("Medicamentos","usuario","Usuário da sessão que registrou.",T,DIGITADO),
+  D("Medicamentos","prontuario","Número do prontuário.",T,DIGITADO),
+  D("Medicamentos","codigo_paciente","Código do paciente usado no estudo.",T,DIGITADO),
+  D("Medicamentos","origem_dado","Fonte do dado registrado.",L,DIGITADO,"Prontuário, Laudo de exame, Ambos, Outra"),
+  D("Medicamentos","data_retirada","Data de retirada na farmácia (não a da receita).",DT,DIGITADO,"Pode ser \"Data não informada\" ou \"Não retirado\""),
+  D("Medicamentos","data_receita","Data da receita.",DT,DIGITADO),
+  D("Medicamentos","codigo_catmat","Código CATMAT (000000 = sem correspondência).",T,DIGITADO),
+  D("Medicamentos","medicamento","Descrição do item no CATMAT/BPS.",T,BPSF),
+  D("Medicamentos","unidade","Unidade de fornecimento do preço.",T,DIGITADO),
+  D("Medicamentos","quantidade","Quantidade retirada, em unidades (não em caixas).",N,DIGITADO),
+  D("Medicamentos","uf","UF de retirada; define o nível de preço.",T,DIGITADO),
+  D("Medicamentos","municipio","Município de retirada (opcional).",T,DIGITADO),
+  D("Medicamentos","situacao","Situações padrão do registro.",L,DIGITADO,"N, AP, IA, AE, D, DP, DE, FI, NC, RP, SC, SS"),
+  D("Medicamentos","doc","Documento de origem.",T,DIGITADO),
+  D("Medicamentos","observacao_usuario","Observação livre; obrigatória para código sem correspondência.",T,DIGITADO),
+  D("Medicamentos","base_bps","Base do BPS usada no preço.",T,AUTO,"MM/AAAA"),
+  D("Medicamentos","nivel_preco","Nível geográfico da mediana usada.",L,AUTO,"Município, UF, Região, Brasil"),
+  D("Medicamentos","n_compras","Número de compras que formam a mediana.",N,BPSF),
+  D("Medicamentos","base_fraca","Sim quando o preço vem do plano B (menos compras que o mínimo do projeto).",SN,AUTO),
+  D("Medicamentos","periodo_bps","Período de compras da mediana.",T,BPSF),
+  D("Medicamentos","valor_unitario","Mediana do BPS por unidade, em reais.",N,BPSF),
+  D("Medicamentos","valor_total","Valor unitário × quantidade, em reais.",N,AUTO),
+  D("Medicamentos","aviso","Avisos de conferência do registro.",T,AUTO),
+  D("Medicamentos","criado_em","Data e hora do registro, no horário de Brasília.",DH,AUTO),
+  /* Resumo */
+  D("Resumo","prontuario","Prontuário do paciente; a última linha é o TOTAL (some na versão sem prontuário).",T,AUTO),
+  D("Resumo","paciente","Versão sem prontuário: código do paciente ou Paciente n; última linha TOTAL.",T,AUTO),
+  D("Resumo","codigo_paciente","Código do paciente.",T,AUTO),
+  D("Resumo","n_registros","Procedimentos mais medicamentos do paciente.",N,AUTO),
+  D("Resumo","n_sem_correspondencia","Registros com código sem correspondência (fora do cálculo).",N,AUTO),
+  D("Resumo","total_procedimentos_tabela","Soma dos procedimentos pelo SIGTAP, com todas as regras, em reais.",N,AUTO),
+  D("Resumo","total_medicamentos","Soma dos medicamentos pelo BPS, em reais.",N,AUTO),
+  D("Resumo","total_caso_base","Procedimentos mais medicamentos, com as regras e os parâmetros padrão, em reais.",N,AUTO,"Caso-base"),
+  D("Resumo","total_sem_incremento","Cenário: total sem o incremento de 20% da habilitação 17.17/17.18, em reais.",N,AUTO,"Sensibilidade"),
+  D("Resumo","total_sem_base_fraca","Cenário: total sem os medicamentos com preço do plano B, em reais.",N,AUTO,"Sensibilidade"),
+  D("Resumo","valor_hospitalar_tabela","Soma dos itens feitos em internação (AIH), em reais.",N,AUTO,"Não se aplica quando não há item hospitalar"),
+  D("Resumo","fator_correcao_hospitalar","Fator de correção aplicado ao valor hospitalar (padrão 2,8).",N,AUTO,"Não se aplica quando não há item hospitalar"),
+  D("Resumo","valor_hospitalar_corrigido","Valor hospitalar × fator, em reais.",N,AUTO,"Não se aplica quando não há item hospitalar"),
+  D("Resumo","total_com_fator_correcao","Cenário: total com o fator aplicado só aos itens hospitalares, em reais.",N,AUTO,"Sensibilidade; Não se aplica quando não há item hospitalar"),
+  /* Avisos e Limitações */
+  D("Avisos","aba","Aba do registro com o aviso.",L,AUTO,"Procedimentos, Internações, Medicamentos"),
+  D("Avisos","id","id do registro de origem.",T,AUTO),
+  D("Avisos","item","Código do procedimento, nº da AIH ou código CATMAT.",T,AUTO),
+  D("Avisos","aviso","Texto do aviso ou da nota de conferência.",T,AUTO),
+  D("Limitações","aba","Aba do registro (Geral para o texto de limitação do site).",L,AUTO,"Geral, Procedimentos, Medicamentos"),
+  D("Limitações","id","id do registro de origem.",T,AUTO),
+  D("Limitações","item","Código do procedimento ou CATMAT.",T,AUTO),
+  D("Limitações","motivo","Motivo: sem correspondência, sem valor, sem preço ou texto geral de limitação.",T,AUTO),
+  /* Parâmetros */
+  D("Parâmetros","chave","Nome do parâmetro do projeto ou da exportação.",T,AUTO),
+  D("Parâmetros","valor","Valor do parâmetro.",T,AUTO),
+  D("Parâmetros","titulo","Título do projeto.",T,DIGITADO),
+  D("Parâmetros","nome_uso","Nome de uso comum à equipe; usado para juntar planilhas.",T,DIGITADO),
+  D("Parâmetros","centro","Centro ou hospital do estudo.",T,DIGITADO),
+  D("Parâmetros","cnes","CNES do estabelecimento (opcional).",T,DIGITADO),
+  D("Parâmetros","uf","UF padrão do projeto.",T,DIGITADO),
+  D("Parâmetros","municipio","Município padrão do projeto.",T,DIGITADO),
+  D("Parâmetros","usuario","Usuário da sessão.",T,DIGITADO),
+  D("Parâmetros","comp_sigtap","Competência do SIGTAP usada em todo o projeto.",T,DIGITADO,"MM/AAAA"),
+  D("Parâmetros","base_bps","Base do BPS usada no projeto.",T,DIGITADO,"MM/AAAA"),
+  D("Parâmetros","bps_ref","Data de referência do BPS (janela de 12 meses antes).",DT,DIGITADO),
+  D("Parâmetros","min_compras","Mínimo de compras por nível de preço.",N,DIGITADO,"Padrão 3"),
+  D("Parâmetros","plano_b","Se aceita o nível mais próximo com 1 compra, marcado como base fraca.",SN,DIGITADO),
+  D("Parâmetros","habilitacao","Habilitação em Oncologia Cirúrgica 17.17/17.18.",L,DIGITADO,"Sem habilitação, Com habilitação"),
+  D("Parâmetros","hab_inicio","Início da vigência da habilitação.",DT,DIGITADO),
+  D("Parâmetros","hab_fim","Fim da vigência da habilitação (31/12/9999 = sem término).",DT,DIGITADO),
+  D("Parâmetros","hab_conferida","Confirma que a habilitação foi conferida no CNES.",SN,DIGITADO),
+  D("Parâmetros","fator","Fator de correção do SIGTAP para o cenário do Resumo.",N,DIGITADO,"Em branco vale 2,8"),
+  D("Parâmetros","criado_em","Data e hora de criação do projeto, no horário de Brasília.",DH,AUTO),
+  D("Parâmetros","versao_site","Versão do OncoCusto que gerou o arquivo.",T,AUTO),
+  D("Parâmetros","exportado_em","Data e hora da exportação, no horário de Brasília.",DH,AUTO),
+  D("Parâmetros","fuso_horario","Fuso horário das datas e horas.",T,AUTO),
+  D("Parâmetros","formato_data_hora","Formato das datas e horas geradas pelo site.",T,AUTO),
+  D("Parâmetros","celulas_vazias","Regra dos valores padrão de células vazias.",T,AUTO),
+  D("Parâmetros","versao_arquivo","Completa ou Sem prontuário.",L,AUTO,"Completa, Sem prontuário"),
+  /* Dicionário */
+  D("Dicionário","aba","Aba da planilha onde a variável aparece.",T,AUTO),
+  D("Dicionário","variavel","Nome da coluna ou do parâmetro.",T,AUTO),
+  D("Dicionário","descricao","O que a variável significa.",T,AUTO),
+  D("Dicionário","tipo","Tipo e formato do valor.",T,AUTO),
+  D("Dicionário","origem","De onde vem o valor: digitado, calculado pelo site, SIGTAP ou BPS.",T,AUTO),
+  D("Dicionário","valores_ou_regra","Valores possíveis ou regra. " + PADRAO_VAZIO + ".",T,AUTO)
+];
+
 $("#exp-baixar").addEventListener("click", () => {
   if (typeof XLSX === "undefined") { toast("A biblioteca de planilhas não carregou. Verifique a internet e recarregue a página.", true); return; }
   if (!state.projeto) { toast("Crie o projeto primeiro.", true); return; }
@@ -1907,10 +2072,11 @@ $("#exp-baixar").addEventListener("click", () => {
                ...state.procs.filter(e => semCorr(e) || e.valor_tabela == null).map(e => ({ aba: "Procedimentos", id: e.id, item: e.co_procedimento, motivo: semCorr(e) ? "Sem correspondência: fora do cálculo" : (e.aviso || "Sem valor") })),
                ...state.meds.filter(e => semCorr(e) || e.valor_total == null).map(e => ({ aba: "Medicamentos", id: e.id, item: e.codigo_catmat, motivo: semCorr(e) ? "Sem correspondência: fora do cálculo" : (e.aviso || "Sem preço") }))];
   add("Limitações", lim, ["aba","id","item","motivo"]);
-  const params = Object.entries(state.projeto).filter(([k]) => !["sa_sh","rt_data","fora_aih","permanencia"].includes(k)).map(([chave, valor]) => ({ chave, valor: typeof valor === "boolean" ? (valor ? "Sim" : "Não") : (valor === "" || valor == null ? NAO_INFORMADO : valor) }));
+  const params = Object.entries(state.projeto).filter(([k]) => !["sa_sh","rt_data","fora_aih","permanencia","fec"].includes(k)).map(([chave, valor]) => ({ chave, valor: typeof valor === "boolean" ? (valor ? "Sim" : "Não") : (valor === "" || valor == null ? NAO_INFORMADO : valor) }));
   params.push({ chave: "versao_site", valor: String(CONFIG.versaoSite) }, { chave: "exportado_em", valor: agoraBR() }, { chave: "fuso_horario", valor: "America/Sao_Paulo (horário de Brasília)" }, { chave: "formato_data_hora", valor: "DD-MM-AAAA HH:MM:SS" },
               { chave: "celulas_vazias", valor: `texto: "${NAO_INFORMADO}" ou "${NAO_SE_APLICA}"; numérico: 0; data: ${DATA_VAZIA}` }, { chave: "versao_arquivo", valor: semPront ? "Sem prontuário" : "Completa" });
   add("Parâmetros", params, ["chave","valor"]);
+  add("Dicionário", DICIONARIO.filter(d => !(semPront && d.variavel === "prontuario" && d.aba !== "Parâmetros")), ["aba","variavel","descricao","tipo","origem","valores_ou_regra"]);
   XLSX.writeFile(wb, $("#exp-nome").textContent);
   toast("Planilha gerada.");
 });
@@ -1920,20 +2086,27 @@ $("#exp-baixar").addEventListener("click", () => {
    ===================================================================== */
 let importado = null;
 const abrirFile = $("#abrir-file");
+const IGNORAR_PARAM = ["versao_site","exportado_em","versao_arquivo","fuso_horario","formato_data_hora","celulas_vazias","sa_sh","rt_data","fora_aih","permanencia","fec"];
+async function parsePlanilha(file){
+  if (typeof XLSX === "undefined") throw new Error("a biblioteca de planilhas não carregou. Verifique a internet e recarregue a página");
+  const wb = XLSX.read(await file.arrayBuffer(), { type: "array" });
+  const aba = n => wb.Sheets[n] ? XLSX.utils.sheet_to_json(wb.Sheets[n], { defval: "", raw: false }) : null;
+  const par = aba("Parâmetros");
+  if (!par) throw new Error("o arquivo não tem a aba Parâmetros");
+  const projeto = {};
+  par.forEach(r => { if (!IGNORAR_PARAM.includes(r.chave)) projeto[r.chave] = r.valor === "Sim" ? true : r.valor === "Não" ? false : desfazPadrao("", r.valor); });
+  const limpa = r => { Object.keys(r).forEach(k => { r[k] = desfazPadrao(k, r[k]); }); return r; };
+  const sitArr = r => { limpa(r); r.situacao = r.situacao && r.situacao !== "N" ? String(r.situacao).split(/;\s*/) : []; return r; };
+  return { nome: file.name, projeto, par,
+    semPront: par.find(r => r.chave === "versao_arquivo")?.valor === "Sem prontuário",
+    exp: par.find(r => r.chave === "exportado_em")?.valor,
+    procs: (aba("Procedimentos") || []).map(sitArr), ints: (aba("Internações") || []).map(limpa), meds: (aba("Medicamentos") || []).map(sitArr) };
+}
 async function lerPlanilha(file){
-  if (typeof XLSX === "undefined") { toast("A biblioteca de planilhas não carregou. Verifique a internet e recarregue a página.", true); return; }
   try {
-    const wb = XLSX.read(await file.arrayBuffer(), { type: "array" });
-    const aba = n => wb.Sheets[n] ? XLSX.utils.sheet_to_json(wb.Sheets[n], { defval: "", raw: false }) : null;
-    const par = aba("Parâmetros");
-    if (!par) throw new Error("o arquivo não tem a aba Parâmetros");
-    const projeto = {};
-    par.forEach(r => { if (!["versao_site","exportado_em","versao_arquivo","fuso_horario","formato_data_hora","celulas_vazias","sa_sh","rt_data","fora_aih","permanencia"].includes(r.chave)) projeto[r.chave] = r.valor === "Sim" ? true : r.valor === "Não" ? false : desfazPadrao("", r.valor); });
-    const limpa = r => { Object.keys(r).forEach(k => { r[k] = desfazPadrao(k, r[k]); }); return r; };
-    const sitArr = r => { limpa(r); r.situacao = r.situacao && r.situacao !== "N" ? String(r.situacao).split(/;\s*/) : []; return r; };
-    importado = { projeto, procs: (aba("Procedimentos") || []).map(sitArr), ints: (aba("Internações") || []).map(limpa), meds: (aba("Medicamentos") || []).map(sitArr) };
-    const semPront = par.find(r => r.chave === "versao_arquivo")?.valor === "Sem prontuário";
-    const exp = par.find(r => r.chave === "exportado_em")?.valor;
+    const x = await parsePlanilha(file);
+    const { projeto, semPront, exp } = x;
+    importado = { projeto, procs: x.procs, ints: x.ints, meds: x.meds };
     $("#abrir-nome").textContent = file.name;
     $("#abrir-meta").textContent = `Exportado em ${exp || "—"} (horário de Brasília) · por ${projeto.usuario || "—"}`;
     $("#abrir-status").textContent = semPront ? "Versão sem prontuário" : "Arquivo válido";
@@ -1960,6 +2133,85 @@ $("#abrir-ok").addEventListener("click", async () => {
   recalcular(); salvarLocal(); aplicarProjetoNoFormulario(); renderTudo();
   $("#abrir-res").classList.add("hidden"); $("#abrir-pick").classList.remove("hidden");
   toast("Projeto aberto e recalculado.");
+  show("revisao");
+});
+
+/* =====================================================================
+   JUNTAR PLANILHAS DA EQUIPE
+   ===================================================================== */
+let juntado = null;
+const chaveExp = t => { const m = /^(\d\d)-(\d\d)-(\d{4}) (\d\d):(\d\d):(\d\d)$/.exec(t || ""); return m ? m[3] + m[2] + m[1] + m[4] + m[5] + m[6] : "0"; };
+const PARAMS_DECISAO = ["comp_sigtap","base_bps","bps_ref","min_compras","plano_b","habilitacao","hab_inicio","hab_fim","fator","centro","uf"];
+async function juntarArquivos(files){
+  const arqs = [];
+  for (const f of files) {
+    try { arqs.push(await parsePlanilha(f)); }
+    catch (err) { arqs.push({ nome: f.name, erro: err.message }); }
+  }
+  const validos = arqs.filter(a => !a.erro && !a.semPront);
+  const cont = new Map(); validos.forEach(a => cont.set(a.projeto.nome_uso, (cont.get(a.projeto.nome_uso) || 0) + 1));
+  const base = [...cont.entries()].sort((a, b) => b[1] - a[1])[0]?.[0];
+  arqs.forEach(a => {
+    if (a.erro) { a.st = "Não foi possível ler: " + a.erro; a.ok = false; }
+    else if (a.semPront) { a.st = "Versão sem prontuário: não pode ser unida"; a.ok = false; }
+    else if (a.projeto.nome_uso !== base) { a.st = "Outro projeto (nome de uso: " + (a.projeto.nome_uso || "—") + ")"; a.ok = false; }
+    else { a.st = "Será unido"; a.ok = true; }
+  });
+  const inc = arqs.filter(a => a.ok).sort((a, b) => chaveExp(a.exp).localeCompare(chaveExp(b.exp)));
+  const lista = $("#juntar-lista"); lista.innerHTML = "";
+  arqs.forEach(a => {
+    const d = document.createElement("div"); d.className = "file";
+    const ic = document.createElement("span"); ic.className = "fic"; ic.textContent = "XLSX";
+    const c = document.createElement("div"); const b = document.createElement("b"); b.textContent = a.nome;
+    const sm = document.createElement("small"); sm.textContent = a.erro ? "—" : `Usuário: ${a.projeto.usuario || "—"} · nome de uso: ${a.projeto.nome_uso || "—"} · exportado em ${a.exp || "—"}`;
+    c.append(b, sm);
+    const st = document.createElement("span"); st.className = "status" + (a.ok ? "" : " w"); st.textContent = a.st;
+    d.append(ic, c, st); lista.append(d);
+  });
+  $("#juntar-qtd").textContent = `· ${arqs.length} selecionado${arqs.length === 1 ? "" : "s"}`;
+  $("#juntar-pick").classList.add("hidden"); $("#juntar-res").classList.remove("hidden");
+  juntado = null;
+  const ok = $("#juntar-ok"), info = $("#juntar-info");
+  if (inc.length < 2) {
+    ["pac","proc","int","med"].forEach(k => $("#juntar-" + k).textContent = "—");
+    info.textContent = "ℹ Escolha pelo menos dois arquivos completos do mesmo nome de uso."; ok.disabled = true; return;
+  }
+  const mapa = { procs: new Map(), ints: new Map(), meds: new Map() };
+  let lidos = 0;
+  inc.forEach(a => ["procs","ints","meds"].forEach(k => a[k].forEach(e => {
+    if (!e.id) e.id = uid();
+    lidos++; mapa[k].set(e.id, e);
+  })));
+  const res = { procs: [...mapa.procs.values()], ints: [...mapa.ints.values()], meds: [...mapa.meds.values()] };
+  const dup = lidos - (res.procs.length + res.ints.length + res.meds.length);
+  const projeto = { ...inc[inc.length - 1].projeto };
+  const difer = PARAMS_DECISAO.filter(k => new Set(inc.map(a => String(a.projeto[k] ?? ""))).size > 1);
+  const poss = (lst, chave) => { const g = new Map(); lst.forEach(e => { const k = chave(e); g.set(k, (g.get(k) || new Set()).add(e.usuario || "")); }); return [...g.values()].filter(u => u.size > 1).length; };
+  const pd = poss(res.procs, e => [e.prontuario, e.co_procedimento, e.data_realizacao].join("|")) + poss(res.meds, e => [e.prontuario, e.codigo_catmat, e.data_retirada].join("|"));
+  $("#juntar-pac").textContent = new Set([...res.procs, ...res.meds].map(e => e.prontuario)).size;
+  $("#juntar-proc").textContent = res.procs.length; $("#juntar-int").textContent = res.ints.length; $("#juntar-med").textContent = res.meds.length;
+  const msg = [`${inc.length} arquivos unidos; ${dup} registro${dup === 1 ? "" : "s"} repetido${dup === 1 ? "" : "s"} (mesmo id) ${dup === 1 ? "foi" : "foram"} reduzido${dup === 1 ? "" : "s"} a um.`,
+    `Os parâmetros do projeto vêm do arquivo exportado por último (${inc[inc.length - 1].nome}).`];
+  if (difer.length) msg.push("Atenção: os arquivos têm decisões diferentes em " + difer.join(", ") + ". Confira antes de usar os resultados.");
+  if (pd) msg.push(`Possíveis duplicidades entre usuários (mesmo paciente, código e data com ids diferentes): ${pd}. Revise na tela Revisão.`);
+  info.textContent = "ℹ " + msg.join(" ");
+  juntado = { projeto, ...res };
+  ok.disabled = false;
+}
+const juntarFile = $("#juntar-file");
+juntarFile.addEventListener("change", () => { if (juntarFile.files.length) juntarArquivos([...juntarFile.files]); juntarFile.value = ""; });
+const dropJ = $("[data-pick=juntar]");
+dropJ.addEventListener("dragover", e => { e.preventDefault(); dropJ.classList.add("over"); });
+dropJ.addEventListener("dragleave", () => dropJ.classList.remove("over"));
+dropJ.addEventListener("drop", e => { e.preventDefault(); dropJ.classList.remove("over"); if (e.dataTransfer.files.length) juntarArquivos([...e.dataTransfer.files].filter(f => /\.xlsx$/i.test(f.name))); });
+$("#juntar-ok").addEventListener("click", async () => {
+  if (!juntado) return;
+  state = { ...juntado, atualizado: null };
+  juntado = null;
+  await Promise.all([carregarSigtap(compAtual()), carregarBPS(bpsAtual())]);
+  recalcular(); salvarLocal(); aplicarProjetoNoFormulario(); renderTudo();
+  $("#juntar-res").classList.add("hidden"); $("#juntar-pick").classList.remove("hidden");
+  toast("Planilhas unidas e recalculadas.");
   show("revisao");
 });
 
@@ -2003,15 +2255,14 @@ document.addEventListener("click", e => {
   if (tag) { tag.classList.toggle("on"); return; }
 
   if (e.target.closest("[data-pick=abrir]")) { abrirFile.click(); return; }
-  const demo = e.target.closest("[data-demo]");
-  if (demo) { demo.closest(".panel").classList.add("hidden"); document.getElementById(demo.dataset.demo + "-res").classList.remove("hidden"); return; }
+  if (e.target.closest("[data-pick=juntar]")) { juntarFile.click(); return; }
 
   const reset = e.target.closest("[data-reset]");
   if (reset) {
     const k = reset.dataset.reset;
     document.getElementById(k + "-res").classList.add("hidden");
-    (k === "abrir" ? $("#abrir-pick") : $(`[data-demo="${k}"]`).closest(".panel")).classList.remove("hidden");
-    if (k === "abrir") importado = null;
+    $("#" + k + "-pick").classList.remove("hidden");
+    if (k === "abrir") importado = null; else juntado = null;
     return;
   }
 
