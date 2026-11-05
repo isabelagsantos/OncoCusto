@@ -520,7 +520,7 @@ footer{max-width:1180px;margin:0 auto;padding:18px 16px 32px;color:var(--muted);
       <div class="panel">
         <h2>Paciente e origem</h2>
         <div class="body fields three">
-          <div class="f"><label>Prontuário <span class="req">*</span></label><input type="text" data-k="prontuario"><div class="checks"><label class="check"><input type="checkbox" data-lock data-same>Mesmo paciente da entrada anterior</label><label class="check"><input type="checkbox" data-lock data-unk="Sem prontuário">Paciente sem prontuário</label></div><span class="help">Sem prontuário: informe o código do paciente; ele identifica o paciente nas somas.</span></div>
+          <div class="f"><label>Prontuário <span class="req">*</span></label><input type="text" data-k="prontuario"><div class="checks"><label class="check"><input type="checkbox" data-lock data-same>Mesmo paciente da entrada anterior</label><label class="check"><input type="checkbox" data-lock data-unk="Sem prontuário">Paciente sem prontuário</label></div><span class="help">Sem prontuário: informe o código do paciente; ele identifica o paciente nas somas. Não dá para marcar sem prontuário e sem código ao mesmo tempo.</span></div>
           <div class="f"><label>Código do paciente <span class="req">*</span></label><input type="text" data-k="codigo_paciente" placeholder="Ex.: PCM001"><div class="checks"><label class="check"><input type="checkbox" data-lock data-same>Mesmo código do paciente da entrada anterior</label><label class="check"><input type="checkbox" data-lock data-unk="Sem código">Sem código específico</label></div></div>
           <div class="f"><label>Origem do dado <span class="req">*</span></label><select data-k="origem_dado"><option>Prontuário</option><option>Laudo de exame</option><option>Ambos</option><option>Outra</option></select><div class="hint hidden" data-outra style="margin-top:6px">⚠ <span>Opcional, porém indicado: registre qual é a origem do dado nas observações livres.</span></div><label class="check"><input type="checkbox" data-lock data-same>Mesma origem da entrada anterior</label></div>
         </div>
@@ -631,7 +631,7 @@ footer{max-width:1180px;margin:0 auto;padding:18px 16px 32px;color:var(--muted);
       <div class="panel">
         <h2>Paciente e origem</h2>
         <div class="body fields three">
-          <div class="f"><label>Prontuário <span class="req">*</span></label><input type="text" data-k="prontuario"><div class="checks"><label class="check"><input type="checkbox" data-lock data-same>Mesmo paciente da entrada anterior</label><label class="check"><input type="checkbox" data-lock data-unk="Sem prontuário">Paciente sem prontuário</label></div><span class="help">Sem prontuário: informe o código do paciente; ele identifica o paciente nas somas.</span></div>
+          <div class="f"><label>Prontuário <span class="req">*</span></label><input type="text" data-k="prontuario"><div class="checks"><label class="check"><input type="checkbox" data-lock data-same>Mesmo paciente da entrada anterior</label><label class="check"><input type="checkbox" data-lock data-unk="Sem prontuário">Paciente sem prontuário</label></div><span class="help">Sem prontuário: informe o código do paciente; ele identifica o paciente nas somas. Não dá para marcar sem prontuário e sem código ao mesmo tempo.</span></div>
           <div class="f"><label>Código do paciente <span class="req">*</span></label><input type="text" data-k="codigo_paciente" placeholder="Ex.: PCM001"><div class="checks"><label class="check"><input type="checkbox" data-lock data-same>Mesmo código do paciente da entrada anterior</label><label class="check"><input type="checkbox" data-lock data-unk="Sem código">Sem código específico</label></div></div>
           <div class="f"><label>Origem do dado <span class="req">*</span></label><select data-k="origem_dado"><option>Prontuário</option><option>Laudo de exame</option><option>Ambos</option><option>Outra</option></select><div class="hint hidden" data-outra style="margin-top:6px">⚠ <span>Opcional, porém indicado: registre qual é a origem do dado nas observações livres.</span></div><label class="check"><input type="checkbox" data-lock data-same>Mesma origem da entrada anterior</label></div>
         </div>
@@ -825,7 +825,6 @@ const CONFIG = {
     "08/2026": { proc: "sigtap_procedimentos_08_2026.json", compat: "sigtap_compatibilidade_08_2026.json" }
   },
   bps: {
-    "10/2026": { mediana: "bps_mediana_10_2026.json", catmat: "catmat_item_10_2026.json" },
     "2025": { mediana: "bps_mediana_2025.json", catmat: "catmat_item_2025.json" },
     "2024": { mediana: "bps_mediana_2024.json", catmat: "catmat_item_2024.json" },
     "2023": { mediana: "bps_mediana_2023.json", catmat: "catmat_item_2023.json" },
@@ -833,7 +832,7 @@ const CONFIG = {
     "2021": { mediana: "bps_mediana_2021.json", catmat: "catmat_item_2021.json" }
   },
   /* Bases padrão de um projeto novo (chaves numéricas como "2025" vêm primeiro em Object.keys, por isso o padrão é explícito) */
-  padrao: { sigtap: "10/2026", bps: "10/2026" },
+  padrao: { sigtap: "10/2026", bps: "2025" },
   ibge: "ibge_municipio_2025.json",
   situacao: "situacao.json",
   meta: "meta_10_2026.json"
@@ -1128,6 +1127,7 @@ function aplicarProjetoNoFormulario(){
 function renderCabecalho(){
   const p = state.projeto;
   $("#pill-proj").textContent = p ? `${p.titulo || "Projeto sem título"} · ${p.usuario || "sem usuário"}` : "Nenhum projeto aberto";
+  if (p && (!CONFIG.sigtap[compAtual()] || !CONFIG.bps[bpsAtual()]) && !renderCabecalho.avisou) { renderCabecalho.avisou = true; toast(`Este projeto usa ${!CONFIG.sigtap[compAtual()] ? "SIGTAP " + compAtual() : "BPS " + bpsAtual()}, que não está mais disponível no site. Escolha outra base na Revisão e recalcule.`, true); }
   $("#ft-sigtap").textContent = `SIGTAP ${compAtual()}`;
   const b = DB.bps[bpsAtual()];
   $("#ft-bps").textContent = `BPS ${bpsAtual()}${b?.periodo ? " (" + b.periodo + ")" : ""}`;
@@ -2334,8 +2334,16 @@ function avisarDatas(view){
   });
 }
 /* Origem "Outra", "mesma data da realização" e situação travada */
+function exclusaoPaciente(v){
+  const sp = $('input[data-unk="Sem prontuário"]', v), sc = $('input[data-unk="Sem código"]', v);
+  if (!sp || !sc) return;
+  const grupo = b => { const g = b.closest(".checks"), c = g && $$("input[type=checkbox]", g).find(x => x.checked); return !!c && c !== b; };
+  sc.disabled = grupo(sc) || sp.checked;
+  sp.disabled = grupo(sp) || sc.checked;
+}
 function atualizarForm(view){
   if (!view) return;
+  exclusaoPaciente(view);
   $$("select[data-k=origem_dado]", view).forEach(sel => { const h = $("[data-outra]", sel.closest(".f")); if (h) h.classList.toggle("hidden", sel.value !== "Outra"); });
   $$("input[data-same-field]:checked", view).forEach(cb => { const campo = $("[data-k]", cb.closest(".f")), o = $(`[data-k=${cb.dataset.sameField}]`, view); if (campo && o) campo.value = o.value; });
   avisarDatas(view);
@@ -2358,7 +2366,10 @@ document.addEventListener("change", e => {
 
 /* Sem prontuário: o código do paciente identifica o paciente */
 function fecharProntuario(e){
-  if (e.prontuario !== "Sem prontuário") return true;
+  if (e.prontuario !== "Sem prontuário") {
+    if (e.codigo_paciente === "Sem código" && /^Sem prontuário/.test(e.prontuario)) { toast("Paciente sem prontuário não pode ficar sem código.", true); return false; }
+    return true;
+  }
   if (!e.codigo_paciente || e.codigo_paciente === "Sem código") { toast("Paciente sem prontuário: informe o código do paciente.", true); return false; }
   e.prontuario = `Sem prontuário (${e.codigo_paciente})`;
   return true;
@@ -2535,6 +2546,7 @@ document.addEventListener("change", e => {
   aplicarTrava(e.target);
   const g = e.target.closest(".checks"); if (g) syncGroup(g);
   syncLocks(e.target.closest(".f"));
+  exclusaoPaciente(e.target.closest(".view"));
 });
 
 document.getElementById("theme").onclick = () => {
