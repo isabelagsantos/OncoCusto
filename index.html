@@ -138,6 +138,10 @@ input:disabled,select:disabled{opacity:.5}
 .panel > .tip{margin:12px 18px 0}
 .auto{background:var(--accent-soft);border-radius:8px;padding:9px 11px;font-size:14px}
 .auto small{display:block;color:var(--muted);font-size:12px}
+.live-warn{margin-top:5px;background:var(--warn-soft);border-radius:8px;padding:6px 10px;font-size:12px}
+.live-warn.hidden{display:none}
+.tags.locked{opacity:.6}.tags.locked .tag{pointer-events:none}
+.edit-banner{margin-bottom:14px;display:flex;gap:10px;align-items:center;justify-content:space-between}
 .hint{display:flex;gap:8px;background:var(--warn-soft);border-radius:8px;padding:7px 10px;font-size:12px}
 .manut{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:baseline;background:var(--warn-soft);color:var(--text);border-bottom:1px solid var(--warn-dot);padding:10px 16px;font-size:13px}
 .manut b{color:var(--warn)}
@@ -516,9 +520,9 @@ footer{max-width:1180px;margin:0 auto;padding:18px 16px 32px;color:var(--muted);
       <div class="panel">
         <h2>Paciente e origem</h2>
         <div class="body fields three">
-          <div class="f"><label>Prontuário <span class="req">*</span></label><input type="text" data-k="prontuario"><label class="check"><input type="checkbox" data-lock data-same>Mesmo paciente da entrada anterior</label></div>
+          <div class="f"><label>Prontuário <span class="req">*</span></label><input type="text" data-k="prontuario"><div class="checks"><label class="check"><input type="checkbox" data-lock data-same>Mesmo paciente da entrada anterior</label><label class="check"><input type="checkbox" data-lock data-unk="Sem prontuário">Paciente sem prontuário</label></div><span class="help">Sem prontuário: informe o código do paciente; ele identifica o paciente nas somas.</span></div>
           <div class="f"><label>Código do paciente <span class="req">*</span></label><input type="text" data-k="codigo_paciente" placeholder="Ex.: PCM001"><div class="checks"><label class="check"><input type="checkbox" data-lock data-same>Mesmo código do paciente da entrada anterior</label><label class="check"><input type="checkbox" data-lock data-unk="Sem código">Sem código específico</label></div></div>
-          <div class="f"><label>Origem do dado <span class="req">*</span></label><select data-k="origem_dado"><option>Prontuário</option><option>Laudo de exame</option><option>Ambos</option><option>Outra</option></select><label class="check"><input type="checkbox" data-lock data-same>Mesma origem da entrada anterior</label></div>
+          <div class="f"><label>Origem do dado <span class="req">*</span></label><select data-k="origem_dado"><option>Prontuário</option><option>Laudo de exame</option><option>Ambos</option><option>Outra</option></select><div class="hint hidden" data-outra style="margin-top:6px">⚠ <span>Opcional, porém indicado: registre qual é a origem do dado nas observações livres.</span></div><label class="check"><input type="checkbox" data-lock data-same>Mesma origem da entrada anterior</label></div>
         </div>
       </div>
 
@@ -533,7 +537,7 @@ footer{max-width:1180px;margin:0 auto;padding:18px 16px 32px;color:var(--muted);
           <div class="f"><label>Data de realização <span class="req">*</span></label><input type="date" data-k="data_realizacao">
             <div class="hint">⚠ Registre a data em que o procedimento foi realizado, não a do pedido.</div>
             <div class="checks"><label class="check"><input type="checkbox" data-lock data-same>Mesma data da entrada anterior</label><label class="check"><input type="checkbox" data-lock data-unk="Data não informada">Data desconhecida</label></div></div>
-          <div class="f"><label>Data do pedido <span class="req">*</span></label><input type="date" data-k="data_pedido"><div class="checks"><label class="check"><input type="checkbox" data-lock data-same>Mesma data da entrada anterior</label><label class="check"><input type="checkbox" data-lock data-unk="Data não informada">Data desconhecida</label></div></div>
+          <div class="f"><label>Data do pedido <span class="req">*</span></label><input type="date" data-k="data_pedido"><div class="checks"><label class="check"><input type="checkbox" data-lock data-same>Mesma data da entrada anterior</label><label class="check"><input type="checkbox" data-lock data-same-field="data_realizacao">Mesma data da realização</label><label class="check"><input type="checkbox" data-lock data-unk="Data não informada">Data desconhecida</label></div></div>
           <div class="f"><label>Quantidade <span class="req">*</span></label><input type="number" data-k="quantidade" value="1" min="1"></div>
           <div class="f"><label>Local do ato <span class="opt">(automático)</span></label><div class="auto" id="proc-local">Ambulatorial<small>Preenchido pelo site: compara a data de realização com as internações cadastradas</small></div></div>
         </div>
@@ -571,9 +575,11 @@ footer{max-width:1180px;margin:0 auto;padding:18px 16px 32px;color:var(--muted);
             <label>Situações padrão <span class="opt">(opcional)</span> <button type="button" class="qm" aria-label="Significado das siglas">?</button></label>
             <div class="tip" data-siglas></div>
             <div class="tags" data-tags></div>
+            <label class="check" style="margin-top:8px"><input type="checkbox" data-sit-same>Mesma situação da entrada anterior</label>
+            <div class="hint hidden" id="proc-ss-aviso" style="margin-top:6px">⚠ <span>A situação <b>SS</b> (Sem SIGTAP no prontuário) foi marcada automaticamente porque o código 00.00.00.000-0 foi escolhido.</span></div>
           </div>
           <div class="f"><label>Documento</label><input type="text" data-k="doc" disabled><label class="check"><input type="checkbox" data-lock data-unk="Não necessário" checked>Não necessário</label></div>
-          <div class="f"><label>Observação livre</label><input type="text" data-k="observacao_usuario"></div>
+          <div class="f"><label>Observação livre</label><input type="text" data-k="observacao_usuario"><label class="check"><input type="checkbox" data-lock data-same>Mesma observação da entrada anterior</label></div>
         </div>
         <div class="form-foot"><button class="btn" data-limpar>Limpar</button><button class="btn pri" id="proc-salvar">Salvar e próximo</button></div>
       </div>
@@ -595,13 +601,13 @@ footer{max-width:1180px;margin:0 auto;padding:18px 16px 32px;color:var(--muted);
       <div class="panel">
         <h2>Nova internação</h2>
         <div class="body fields three">
-          <div class="f"><label>Prontuário <span class="req">*</span></label><input type="text" data-k="prontuario"><label class="check"><input type="checkbox" data-lock data-same>Mesmo paciente da entrada anterior</label></div>
+          <div class="f"><label>Prontuário <span class="req">*</span></label><input type="text" data-k="prontuario"><label class="check"><input type="checkbox" data-lock data-same>Mesmo paciente da entrada anterior</label><span class="help">Paciente sem prontuário: use o mesmo texto das outras abas, ex.: Sem prontuário (PCM001).</span></div>
           <div class="f"><label>Nº da AIH <span class="req">*</span></label><input type="text" data-k="aih" placeholder="Ex.: Cirurgia 1"></div>
           <div class="f"><label>Tipo de AIH <span class="req">*</span></label><select data-k="tipo_aih"><option>Comum</option><option>Sequenciais em oncologia (04.15.02.005-0)</option><option>Cirurgias múltiplas (04.15.01.001-2)</option><option>Outras sequenciais (04.15.02.003-4)</option><option>Outro tipo…</option></select><span class="help">Lista completa a definir.</span></div>
           <div class="f"><label>Data de entrada <span class="req">*</span></label><input type="date" data-k="data_entrada"></div>
           <div class="f"><label>Data de alta <span class="req">*</span></label><input type="date" data-k="data_alta"></div>
           <div class="f"><label>Motivo de saída <span class="req">*</span></label><select data-k="motivo_saida"><option>Alta</option><option>Transferência</option><option>Óbito</option><option>Permanência</option></select></div>
-          <div class="f full"><label>Observação <span class="opt">(opcional)</span></label><input type="text" data-k="observacao_usuario"></div>
+          <div class="f full"><label>Observação <span class="opt">(opcional)</span></label><input type="text" data-k="observacao_usuario"><label class="check"><input type="checkbox" data-lock data-same>Mesma observação da entrada anterior</label></div>
         </div>
         <div class="form-foot"><button class="btn" data-limpar>Limpar</button><button class="btn pri" id="int-salvar">Salvar internação</button></div>
       </div>
@@ -625,9 +631,9 @@ footer{max-width:1180px;margin:0 auto;padding:18px 16px 32px;color:var(--muted);
       <div class="panel">
         <h2>Paciente e origem</h2>
         <div class="body fields three">
-          <div class="f"><label>Prontuário <span class="req">*</span></label><input type="text" data-k="prontuario"><label class="check"><input type="checkbox" data-lock data-same>Mesmo paciente da entrada anterior</label></div>
+          <div class="f"><label>Prontuário <span class="req">*</span></label><input type="text" data-k="prontuario"><div class="checks"><label class="check"><input type="checkbox" data-lock data-same>Mesmo paciente da entrada anterior</label><label class="check"><input type="checkbox" data-lock data-unk="Sem prontuário">Paciente sem prontuário</label></div><span class="help">Sem prontuário: informe o código do paciente; ele identifica o paciente nas somas.</span></div>
           <div class="f"><label>Código do paciente <span class="req">*</span></label><input type="text" data-k="codigo_paciente" placeholder="Ex.: PCM001"><div class="checks"><label class="check"><input type="checkbox" data-lock data-same>Mesmo código do paciente da entrada anterior</label><label class="check"><input type="checkbox" data-lock data-unk="Sem código">Sem código específico</label></div></div>
-          <div class="f"><label>Origem do dado <span class="req">*</span></label><select data-k="origem_dado"><option>Prontuário</option><option>Laudo de exame</option><option>Ambos</option><option>Outra</option></select><label class="check"><input type="checkbox" data-lock data-same>Mesma origem da entrada anterior</label></div>
+          <div class="f"><label>Origem do dado <span class="req">*</span></label><select data-k="origem_dado"><option>Prontuário</option><option>Laudo de exame</option><option>Ambos</option><option>Outra</option></select><div class="hint hidden" data-outra style="margin-top:6px">⚠ <span>Opcional, porém indicado: registre qual é a origem do dado nas observações livres.</span></div><label class="check"><input type="checkbox" data-lock data-same>Mesma origem da entrada anterior</label></div>
         </div>
       </div>
 
@@ -640,7 +646,17 @@ footer{max-width:1180px;margin:0 auto;padding:18px 16px 32px;color:var(--muted);
             <div id="med-info" class="hidden"></div>
           </div>
           <div class="f"><label>Unidade de fornecimento <span class="req">*</span></label><select data-k="unidade" id="med-un"><option value="">Escolha o medicamento</option></select></div>
-          <div class="f"><label>Quantidade <span class="req">*</span></label><input type="number" data-k="quantidade" id="med-qtd" min="1" value="1"><span class="help">Em unidades, não em caixas.</span></div>
+          <div class="f"><label>Quantidade <span class="req">*</span></label><input type="number" data-k="quantidade" id="med-qtd" min="1" step="any" value="1"><span class="help" id="med-qtd-help">Na unidade de fornecimento escolhida (comprimido, frasco etc.).</span>
+            <label class="check"><input type="checkbox" id="med-caixas">O prontuário informa só caixas</label>
+            <div class="hint hidden" id="med-caixas-un" style="margin-top:6px">⚠ <span>A unidade de fornecimento escolhida já é a caixa: informe o número de caixas na Quantidade e desmarque a opção acima.</span></div></div>
+          <div class="f full hidden" id="med-caixas-box">
+            <div class="info">ℹ <span>O preço do BPS é por unidade de fornecimento (por exemplo, comprimido). Com a receita em caixas, o site converte: <b>nº de caixas × unidades por caixa</b>. As unidades por caixa constam da embalagem, da bula ou da lista CMED. A conversão fica registrada na planilha e vira um aviso na Revisão. Sem as unidades por caixa, calcule pela posologia (unidades por dose × doses por dia × dias de uso), digite o resultado na Quantidade e explique na observação livre.</span></div>
+            <div class="fields" style="margin-top:8px">
+              <div class="f"><label>Nº de caixas <span class="req">*</span></label><input type="number" data-k="qtd_caixas" min="0" step="any"></div>
+              <div class="f"><label>Unidades por caixa <span class="req">*</span></label><input type="number" data-k="un_por_caixa" min="0" step="any"></div>
+              <div class="f"><label>Quantidade em unidades <span class="opt">(automático)</span></label><div class="auto" id="med-caixas-res">—</div></div>
+            </div>
+          </div>
           <div class="f"><label>Data de retirada <span class="req">*</span></label><input type="date" data-k="data_retirada">
             <div class="hint">⚠ Registre a data de retirada na farmácia, não a da receita.</div>
             <div class="checks"><label class="check"><input type="checkbox" data-lock data-same>Mesma data da entrada anterior</label><label class="check"><input type="checkbox" data-lock data-unk="Data não informada">Data desconhecida</label><label class="check"><input type="checkbox" data-lock data-unk="Não retirado">Não retirado</label></div></div>
@@ -658,9 +674,10 @@ footer{max-width:1180px;margin:0 auto;padding:18px 16px 32px;color:var(--muted);
             <label>Situações padrão <span class="opt">(opcional)</span> <button type="button" class="qm" aria-label="Significado das siglas">?</button></label>
             <div class="tip" data-siglas></div>
             <div class="tags" data-tags></div>
+            <label class="check" style="margin-top:8px"><input type="checkbox" data-sit-same>Mesma situação da entrada anterior</label>
           </div>
           <div class="f"><label>Documento</label><input type="text" data-k="doc" disabled><label class="check"><input type="checkbox" data-lock data-unk="Não necessário" checked>Não necessário</label></div>
-          <div class="f"><label>Observação livre</label><input type="text" data-k="observacao_usuario"></div>
+          <div class="f"><label>Observação livre</label><input type="text" data-k="observacao_usuario"><label class="check"><input type="checkbox" data-lock data-same>Mesma observação da entrada anterior</label></div>
         </div>
         <div class="form-foot"><button class="btn" data-limpar>Limpar</button><button class="btn pri" id="med-salvar">Salvar e próximo</button></div>
       </div>
@@ -718,7 +735,7 @@ footer{max-width:1180px;margin:0 auto;padding:18px 16px 32px;color:var(--muted);
       <div class="panel">
         <h2>Arquivo</h2>
         <div class="body fields">
-          <div class="f"><label>Nome do arquivo</label><div class="auto"><span class="mono" id="exp-nome">titulo-do-projeto_AAAA-MM-DD.xlsx</span></div></div>
+          <div class="f"><label>Nome do arquivo</label><div class="auto"><span class="mono" id="exp-nome">AAAA-MM-DD_titulo-do-projeto_AAAA-MM-DD_completa.xlsx</span></div></div>
           <div class="f"><label>Versão</label><div class="seg" id="exp-versao"><button class="on">Completa</button><button>Sem prontuário</button></div></div>
         </div>
       </div>
@@ -797,18 +814,26 @@ footer{max-width:1180px;margin:0 auto;padding:18px 16px 32px;color:var(--muted);
 const MANUTENCAO = { ativo: false, inicio: "2026-10-20", dias_uteis: 5 };
 
 const CONFIG = {
-  versaoSite: "0.6",
+  versaoSite: "0.7",
   /* Aviso de novidades no fim da página: some sozinho 1 mês depois de publicadoEm (AAAA-MM-DD). Ao publicar uma nova versão, atualize as duas linhas. */
-  publicadoEm: "2026-10-28",
-  novidades: "A planilha exportada agora inclui a aba Dicionário, com o significado de cada variável. Procedimentos secundários sem principal compatível no mês deixam de ser cobrados (com aviso). A tela Juntar planilhas da equipe agora funciona.",
+  publicadoEm: "2026-11-05",
+  novidades: "Colar datas nos campos; \"mesma entrada anterior\" vale entre Procedimentos, Internações e Medicamentos; avisos de data ao digitar; paciente sem prontuário; situação SS automática para o código 00.00.00.000-0; medicamento informado em caixas; botão Editar na Revisão; novo nome do arquivo exportado; novas bases SIGTAP 08/2026 e BPS 2021 a 2025.",
   pastas: ["dados/", ""],               // procura primeiro em dados/, depois na raiz do repositório
   sigtap: {
     "10/2026": { proc: "sigtap_procedimentos_10_2026.json", compat: "sigtap_compatibilidade_10_2026.json" },
-    "09/2026": { proc: "sigtap_procedimentos_09_2026.json", compat: "sigtap_compatibilidade_09_2026.json" }
+    "09/2026": { proc: "sigtap_procedimentos_09_2026.json", compat: "sigtap_compatibilidade_09_2026.json" },
+    "08/2026": { proc: "sigtap_procedimentos_08_2026.json", compat: "sigtap_compatibilidade_08_2026.json" }
   },
   bps: {
-    "10/2026": { mediana: "bps_mediana_10_2026.json", catmat: "catmat_item_10_2026.json" }
+    "10/2026": { mediana: "bps_mediana_10_2026.json", catmat: "catmat_item_10_2026.json" },
+    "2025": { mediana: "bps_mediana_2025.json", catmat: "catmat_item_2025.json" },
+    "2024": { mediana: "bps_mediana_2024.json", catmat: "catmat_item_2024.json" },
+    "2023": { mediana: "bps_mediana_2023.json", catmat: "catmat_item_2023.json" },
+    "2022": { mediana: "bps_mediana_2022.json", catmat: "catmat_item_2022.json" },
+    "2021": { mediana: "bps_mediana_2021.json", catmat: "catmat_item_2021.json" }
   },
+  /* Bases padrão de um projeto novo (chaves numéricas como "2025" vêm primeiro em Object.keys, por isso o padrão é explícito) */
+  padrao: { sigtap: "10/2026", bps: "10/2026" },
   ibge: "ibge_municipio_2025.json",
   situacao: "situacao.json",
   meta: "meta_10_2026.json"
@@ -842,8 +867,10 @@ function salvarLocal(){
 function lerLocal(){
   try { const s = JSON.parse(localStorage.getItem(LS_KEY) || "null"); return s && typeof s === "object" ? s : null; } catch(e){ return null; }
 }
-const compAtual = () => state.projeto?.comp_sigtap || Object.keys(CONFIG.sigtap)[0];
-const bpsAtual  = () => state.projeto?.base_bps    || Object.keys(CONFIG.bps)[0];
+/* Padrão primeiro; depois competências MM/AAAA da mais nova para a mais antiga; depois anos, do mais novo para o mais antigo */
+const ordemBases = cfg => Object.keys(cfg).sort((a, b) => (b === CONFIG.padrao.sigtap || b === CONFIG.padrao.bps) - (a === CONFIG.padrao.sigtap || a === CONFIG.padrao.bps) || (a.includes("/") ? 0 : 1) - (b.includes("/") ? 0 : 1) || (a.includes("/") ? a.split("/").reverse().join("") < b.split("/").reverse().join("") : a < b) * 2 - 1);
+const compAtual = () => state.projeto?.comp_sigtap || CONFIG.padrao.sigtap;
+const bpsAtual  = () => state.projeto?.base_bps    || CONFIG.padrao.bps;
 const minCompras = () => Math.max(1, parseInt(state.projeto?.min_compras, 10) || 3);
 const fatorCorrecao = () => { const v = parseFloat(String(state.projeto?.fator ?? "").replace(",", ".")); return v > 0 ? v : 2.8; };
 const planoB = () => state.projeto?.plano_b !== false && state.projeto?.plano_b !== "false";
@@ -1002,8 +1029,8 @@ function popularMun(sel, uf, valor){
   if (valor != null) sel.value = valor;
 }
 function popularBases(){
-  $$("select[data-comp]").forEach(sel => { sel.innerHTML = Object.keys(CONFIG.sigtap).map(c => `<option>${c}</option>`).join(""); sel.value = compAtual(); });
-  $$("select[data-bps]").forEach(sel => { sel.innerHTML = Object.keys(CONFIG.bps).map(c => `<option>${c}</option>`).join(""); sel.value = bpsAtual(); });
+  $$("select[data-comp]").forEach(sel => { sel.innerHTML = ordemBases(CONFIG.sigtap).map(c => `<option>${c}</option>`).join(""); sel.value = compAtual(); });
+  $$("select[data-bps]").forEach(sel => { sel.innerHTML = ordemBases(CONFIG.bps).map(c => `<option>${c}</option>`).join(""); sel.value = bpsAtual(); });
 }
 
 const SIGLAS_PADRAO = [["N","Normal"],["AP","Apenas no prontuário"],["IA","Incluído na AIH"],["AE","Apenas nos exames"],["D","Dúvida"],["DP","Duplicado no prontuário"],["DE","Duplicado nos exames"],["FI","Fora da instituição"],["NC","Não em conjunto"],["RP","Realizado só no prontuário"],["SC","Sem correspondência"],["SS","Sem SIGTAP no prontuário"]];
@@ -1032,6 +1059,7 @@ function ler(view){
     const unk = f ? $$("input[data-unk]", f).find(c => c.checked) : null;
     o[k] = unk ? unk.dataset.unk : el.value.trim();
   });
+  $$("input[data-same-field]:checked", view).forEach(cb => { const campo = $("[data-k]", cb.closest(".f")); if (campo && cb.dataset.sameField in o) o[campo.dataset.k] = o[cb.dataset.sameField]; });
   o.situacao = $$(".tag.on", view).map(t => t.dataset.s);
   return o;
 }
@@ -1045,6 +1073,7 @@ function preencher(view, obj){
     if (el.dataset.k === "municipio" && view.querySelector("[data-uf]")) return; // já preenchido junto com a UF
     el.value = v ?? "";
   });
+  if (typeof atualizarForm === "function") atualizarForm(view);
 }
 function limpar(view){
   $$("[data-k]", view).forEach(el => {
@@ -1053,7 +1082,8 @@ function limpar(view){
     else if (el.dataset.k === "quantidade") el.value = 1;
     else el.value = "";
   });
-  $$(".tag.on", view).forEach(t => t.classList.remove("on"));
+  if (!$("input[data-sit-same]:checked", view)) $$(".tag.on", view).forEach(t => t.classList.remove("on"));
+  if (typeof atualizarForm === "function") atualizarForm(view);
 }
 
 /* "Mesmo… da entrada anterior" e "cadastrado em Projeto" copiam o valor */
@@ -1062,10 +1092,13 @@ function aplicarTrava(cb){
   const field = $("[data-k]", f);
   if (!field || !cb.checked) return;
   if (cb.dataset.same !== undefined){
-    const lista = state[cb.closest("[data-form]").dataset.form] || [];
-    const ultimo = lista[lista.length - 1];
-    if (!ultimo){ toast("Ainda não há entrada anterior neste projeto."); cb.checked = false; return; }
-    field.value = ultimo[field.dataset.k] ?? "";
+    const u = ultimoCom(field.dataset.k);
+    if (!u){ toast("Ainda não há entrada anterior neste projeto."); cb.checked = false; return; }
+    field.value = u.v ?? "";
+  }
+  if (cb.dataset.sameField){
+    const o = $(`[data-k=${cb.dataset.sameField}]`, cb.closest(".view"));
+    field.value = o ? o.value : "";
   }
   if (cb.dataset.proj){
     const v = state.projeto?.[cb.dataset.proj];
@@ -1110,8 +1143,7 @@ function renderCabecalho(){
   mostrarManutencao();
   $("#proc-comp-lbl").textContent = `· SIGTAP ${compAtual()}`;
   $("#med-bps-lbl").textContent = `· BPS ${bpsAtual()}`;
-  const slug = norm(p?.titulo || "titulo-do-projeto").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "projeto";
-  $("#exp-nome").textContent = `${slug}_${hoje()}.xlsx`;
+  atualizarNomeArquivo();
 }
 $("#proj-salvar").addEventListener("click", async () => {
   const p = ler($("#v-projeto"));
@@ -1252,10 +1284,18 @@ autocomplete(procBusca,
 );
 procBusca.addEventListener("input", () => { if (selProc && procBusca.value !== procBusca.dataset.escolhido) { selProc = null; procBusca.dataset.escolhido = ""; renderProcInfo(); } });
 
-function escolherProc(p){
+let ssAuto = false;
+function escolherProc(p, quieto){
   selProc = p;
   procBusca.value = procBusca.dataset.escolhido = `${fmtCod(p.co_procedimento)} — ${p.no_procedimento}`;
   renderProcInfo();
+  if (quieto) return;
+  const v = $("#v-procedimentos"), tagSS = $('.tag[data-s="SS"]', v), aviso = $("#proc-ss-aviso");
+  if (p.co_procedimento === SC_PROC && tagSS) {
+    const same = $("input[data-sit-same]", v); if (same && same.checked) { same.checked = false; $(".tags", v).classList.remove("locked"); }
+    tagSS.classList.add("on"); ssAuto = true; aviso.classList.remove("hidden");
+    toast("Situação SS marcada automaticamente: código sem correspondência no SIGTAP.");
+  } else if (ssAuto) { if (tagSS) tagSS.classList.remove("on"); ssAuto = false; aviso.classList.add("hidden"); }
 }
 function renderProcInfo(){
   const box = $("#proc-info");
@@ -1307,15 +1347,17 @@ $("#proc-salvar").addEventListener("click", () => {
   const e = ler(v);
   if (!selProc) { toast("Escolha um procedimento da lista.", true); procBusca.focus(); return; }
   if (!e.prontuario) { toast("Informe o prontuário.", true); return; }
+  if (!fecharProntuario(e)) return;
   if (selProc.co_procedimento === SC_PROC && !e.observacao_usuario) { toast("Código sem correspondência: a observação livre é obrigatória.", true); $("[data-k=observacao_usuario]", v).focus(); return; }
   if (ehOPM(selProc.co_procedimento) && !e.co_principal_opm) { toast("Escolha o procedimento principal do OPM.", true); $("#opm-principal").focus(); return; }
   if (!ehOPM(selProc.co_procedimento)) { e.co_principal_opm = ""; e.qtd_conferida_sigtap = ""; }
-  Object.assign(e, { id: uid(), usuario: state.projeto.usuario, co_procedimento: selProc.co_procedimento, criado_em: agoraBR() });
-  state.procs.push(e);
+  const edit = editando?.lista === "procs" ? state.procs.findIndex(x => x.id === editando.id) : -1;
+  if (edit >= 0) { const o = state.procs[edit]; Object.assign(e, { id: o.id, usuario: o.usuario, co_procedimento: selProc.co_procedimento, criado_em: o.criado_em }); state.procs[edit] = e; }
+  else { Object.assign(e, { id: uid(), usuario: state.projeto.usuario, co_procedimento: selProc.co_procedimento, criado_em: agoraBR() }); state.procs.push(e); }
   recalcular(); salvarLocal(); renderTudo();
-  limpar(v); selProc = null; procBusca.value = ""; procBusca.dataset.escolhido = ""; renderProcInfo(); atualizarLocal();
+  limparTudo(v); ssAuto = false; $("#proc-ss-aviso").classList.add("hidden");
   procBusca.focus();
-  toast("Procedimento salvo.");
+  toast(edit >= 0 ? "Alterações salvas." : "Procedimento salvo.");
 });
 
 /* =====================================================================
@@ -1326,12 +1368,13 @@ $("#int-salvar").addEventListener("click", () => {
   const v = $("#v-internacoes");
   const e = ler(v);
   if (!e.prontuario || !e.aih) { toast("Informe o prontuário e o nº da AIH.", true); return; }
-  if (state.ints.some(i => i.prontuario === e.prontuario && i.aih === e.aih)) { toast("Esta AIH já está cadastrada para este prontuário.", true); return; }
-  Object.assign(e, { id: uid(), usuario: state.projeto.usuario, criado_em: agoraBR() });
-  state.ints.push(e);
+  const edit = editando?.lista === "ints" ? state.ints.findIndex(x => x.id === editando.id) : -1;
+  if (state.ints.some((i, n) => n !== edit && i.prontuario === e.prontuario && i.aih === e.aih)) { toast("Esta AIH já está cadastrada para este prontuário.", true); return; }
+  if (edit >= 0) { const o = state.ints[edit]; Object.assign(e, { id: o.id, usuario: o.usuario, criado_em: o.criado_em }); state.ints[edit] = e; }
+  else { Object.assign(e, { id: uid(), usuario: state.projeto.usuario, criado_em: agoraBR() }); state.ints.push(e); }
   recalcular(); salvarLocal(); renderTudo();
-  limpar(v);
-  toast("Internação salva.");
+  limparTudo(v);
+  toast(edit >= 0 ? "Alterações salvas." : "Internação salva.");
 });
 
 /* =====================================================================
@@ -1404,14 +1447,21 @@ $("#med-salvar").addEventListener("click", () => {
   const e = ler(v);
   if (!selMed) { toast("Escolha um medicamento da lista.", true); medBusca.focus(); return; }
   if (!e.prontuario) { toast("Informe o prontuário.", true); return; }
+  if (!fecharProntuario(e)) return;
   if (!e.uf) { toast("Informe a UF de retirada.", true); return; }
   if (selMed.co_catmat === SC_MED && !e.observacao_usuario) { toast("Código sem correspondência: a observação livre é obrigatória.", true); $("[data-k=observacao_usuario]", v).focus(); return; }
-  Object.assign(e, { id: uid(), usuario: state.projeto.usuario, codigo_catmat: selMed.co_catmat, criado_em: agoraBR() });
-  state.meds.push(e);
+  if ($("#med-caixas").checked) {
+    const c = Number(e.qtd_caixas), u = Number(e.un_por_caixa);
+    if (!(c > 0 && u > 0)) { toast("Informe o nº de caixas e as unidades por caixa.", true); return; }
+    e.quantidade = Math.round(c * u * 100) / 100;
+  } else { e.qtd_caixas = ""; e.un_por_caixa = ""; }
+  const edit = editando?.lista === "meds" ? state.meds.findIndex(x => x.id === editando.id) : -1;
+  if (edit >= 0) { const o = state.meds[edit]; Object.assign(e, { id: o.id, usuario: o.usuario, codigo_catmat: selMed.co_catmat, criado_em: o.criado_em }); state.meds[edit] = e; }
+  else { Object.assign(e, { id: uid(), usuario: state.projeto.usuario, codigo_catmat: selMed.co_catmat, criado_em: agoraBR() }); state.meds.push(e); }
   recalcular(); salvarLocal(); renderTudo();
-  limpar(v); selMed = null; medBusca.value = ""; medBusca.dataset.escolhido = ""; renderMedInfo();
+  limparTudo(v);
   medBusca.focus();
-  toast("Medicamento salvo.");
+  toast(edit >= 0 ? "Alterações salvas." : "Medicamento salvo.");
 });
 
 /* UF → municípios em qualquer tela */
@@ -1712,6 +1762,7 @@ function recalcular(){
     else L.push(!DB.bps[bpsAtual()]?.pronto ? "Base BPS não carregada" : !r ? "Sem registro de preço" : r.fraca ? `Base fraca: ${r.n_compras} ${r.n_compras == 1 ? "compra" : "compras"} (mínimo ${minCompras()})` : "");
     if (!semCorr(e) && e.data_retirada && state.procs.some(x => x.prontuario === e.prontuario && x.data_realizacao === e.data_retirada && ehQuimio(x.co_procedimento)))
       L.push("Mesmo dia de quimioterapia: se foi dado na sessão, não registre (já incluído na APAC)");
+    if (Number(e.qtd_caixas) > 0) L.push(`Quantidade estimada: ${e.qtd_caixas} caixa(s) × ${e.un_por_caixa} unidade(s) por caixa`);
     if (ehData(e.data_retirada) && e.data_retirada > hj) L.push("Data de retirada no futuro");
     if (ehData(e.data_receita) && e.data_receita > hj) L.push("Data da receita no futuro");
     if (ehData(e.data_retirada) && ehData(e.data_receita) && e.data_retirada < e.data_receita) L.push("Data de retirada anterior à da receita");
@@ -1734,6 +1785,8 @@ function recalcular(){
 const sit = e => (e.situacao && e.situacao.length ? e.situacao.join(", ") : "N");
 const avisoCel = a => a ? `<span class="dot"></span>${esc(a)}` : `<span class="ok">—</span>`;
 const btnExcluir = (tipo, id) => `<button class="btn sm" data-del="${tipo}:${id}">Excluir</button>`;
+const btnEditar = (tipo, id) => `<button class="btn sm" data-edit="${tipo}:${id}">Editar</button> `;
+const acoes = (tipo, id) => btnEditar(tipo, id) + btnExcluir(tipo, id);
 const vazio = (cols, txt) => `<tr><td colspan="${cols}" class="empty-row">${txt}</td></tr>`;
 
 function linhasRevisao(){
@@ -1750,18 +1803,18 @@ function renderTudo(){
   const ps = state.procs.slice(-5).reverse();
   $("[data-rows=proc]").innerHTML = ps.length ? ps.map(e => `<tr${e.aviso ? ' class="warn"' : ""}>
     <td>${esc(e.prontuario)}</td><td>${dataBR(e.data_realizacao)}</td><td class="wrap"><span class="mono">${fmtCod(e.co_procedimento)}</span> ${esc(e.no_procedimento)}</td>
-    <td>${esc(e.local_ato)}</td><td>${esc(sit(e))}</td><td class="val">${brl(e.valor_tabela)}</td><td>${avisoCel(e.aviso)}</td><td>${btnExcluir("procs", e.id)}</td></tr>`).join("")
+    <td>${esc(e.local_ato)}</td><td>${esc(sit(e))}</td><td class="val">${brl(e.valor_tabela)}</td><td>${avisoCel(e.aviso)}</td><td>${acoes("procs", e.id)}</td></tr>`).join("")
     : vazio(8, "Nenhum procedimento registrado ainda.");
   /* Medicamentos: últimas 5 */
   const ms = state.meds.slice(-5).reverse();
   $("[data-rows=med]").innerHTML = ms.length ? ms.map(e => `<tr${e.aviso ? ' class="warn"' : ""}>
     <td>${esc(e.prontuario)}</td><td>${dataBR(e.data_retirada)}</td><td class="wrap">${esc(e.medicamento)}</td><td>${esc(e.quantidade)} ${esc(String(e.unidade || "").toLowerCase())}</td>
-    <td>${esc(sit(e))}</td><td class="val">${brl(e.valor_total)}</td><td>${avisoCel(e.aviso)}</td><td>${btnExcluir("meds", e.id)}</td></tr>`).join("")
+    <td>${esc(sit(e))}</td><td class="val">${brl(e.valor_total)}</td><td>${avisoCel(e.aviso)}</td><td>${acoes("meds", e.id)}</td></tr>`).join("")
     : vazio(8, "Nenhum medicamento registrado ainda.");
   /* Internações */
   $("[data-rows=int]").innerHTML = state.ints.length ? state.ints.map(e => `<tr${e.aviso ? ' class="warn"' : ""}>
     <td>${esc(e.prontuario)}</td><td>${esc(e.aih)}</td><td>${esc(e.tipo_aih)}</td><td>${dataBR(e.data_entrada)}</td><td>${dataBR(e.data_alta)}</td><td>${esc(e.motivo_saida)}</td>
-    <td>${e.n_procedimentos}</td><td>${avisoCel(e.aviso)}</td><td>${btnExcluir("ints", e.id)}</td></tr>`).join("")
+    <td>${e.n_procedimentos}</td><td>${avisoCel(e.aviso)}</td><td>${acoes("ints", e.id)}</td></tr>`).join("")
     : vazio(9, "Nenhuma internação cadastrada ainda.");
   renderRevisao();
   /* Contadores */
@@ -1799,7 +1852,7 @@ function renderRevisao(){
   $("[data-rows=rev]").innerHTML = vis.length ? vis.map(l => `<tr${l.aviso ? ' class="warn"' : ""}>
     <td><button class="linkbtn" data-exp="${esc(l.e.id)}" aria-label="Ver todos os campos">${ABERTAS.has(l.e.id) ? "▾" : "▸"}</button></td><td>${esc(l.pac)}</td><td>${dataBR(l.data)}</td><td class="mono">${esc(l.cod)}</td><td class="wrap">${esc(l.desc)}</td><td>${esc(l.local)}</td>
     <td>${esc(sit(l.e))}</td><td class="val" title="${l.tipo === "proc" ? "Valor de tabela com as regras de custeio (APAC, AIH, situações e incremento)" : "Mediana do BPS × quantidade"}">${brl(l.valor)}</td>
-    <td>${avisoCel(l.aviso)}</td><td>${btnExcluir(l.tipo === "proc" ? "procs" : "meds", l.e.id)}</td></tr>${ABERTAS.has(l.e.id) ? detalheRevisao(l) : ""}`).join("")
+    <td>${avisoCel(l.aviso)}</td><td>${acoes(l.tipo === "proc" ? "procs" : "meds", l.e.id)}</td></tr>${ABERTAS.has(l.e.id) ? detalheRevisao(l) : ""}`).join("")
     : vazio(10, L.length ? "Nenhuma entrada com estes filtros." : "Nenhuma entrada registrada ainda.");
   /* estatísticas */
   $("#st-pac").textContent = new Set(L.map(l => l.pac)).size;
@@ -1862,10 +1915,10 @@ document.addEventListener("click", e => {
 const COLS = {
   proc: ["id","usuario","prontuario","codigo_paciente","origem_dado","data_realizacao","data_pedido","data_custo","co_procedimento","no_procedimento","classificacao","quantidade","local_ato","forma_cobranca","item_hospitalar","aih_do_periodo","aih","tipo_aih","ordem_aih","apac","rt_inicio","rt_fim","rt_sessoes","situacao","doc","observacao_usuario","competencia","co_principal_opm","qtd_conferida_sigtap","nota_conferencia","vl_sa","vl_sh","vl_sp","vl_tot_hosp","incremento_aplicado","valor_sem_incremento","valor_tabela","obs_regra","aviso","criado_em"],
   int:  ["id","usuario","prontuario","aih","tipo_aih","data_entrada","data_alta","motivo_saida","observacao_usuario","n_procedimentos","aviso","criado_em"],
-  med:  ["id","usuario","prontuario","codigo_paciente","origem_dado","data_retirada","data_receita","codigo_catmat","medicamento","unidade","quantidade","uf","municipio","situacao","doc","observacao_usuario","base_bps","nivel_preco","n_compras","base_fraca","periodo_bps","valor_unitario","valor_total","aviso","criado_em"]
+  med:  ["id","usuario","prontuario","codigo_paciente","origem_dado","data_retirada","data_receita","codigo_catmat","medicamento","unidade","quantidade","qtd_caixas","un_por_caixa","uf","municipio","situacao","doc","observacao_usuario","base_bps","nivel_preco","n_compras","base_fraca","periodo_bps","valor_unitario","valor_total","aviso","criado_em"]
 };
 /* Células vazias: texto → "Não informado" ou "Não se aplica"; numérico → 0; data → data inexistente */
-const COL_NUM = new Set(["quantidade","ordem_aih","rt_sessoes","vl_sa","vl_sh","vl_sp","vl_tot_hosp","valor_sem_incremento","valor_tabela","n_compras","valor_unitario","valor_total","n_procedimentos"]);
+const COL_NUM = new Set(["quantidade","qtd_caixas","un_por_caixa","ordem_aih","rt_sessoes","vl_sa","vl_sh","vl_sp","vl_tot_hosp","valor_sem_incremento","valor_tabela","n_compras","valor_unitario","valor_total","n_procedimentos"]);
 const COL_DATA = new Set(["data_realizacao","data_pedido","data_custo","rt_inicio","rt_fim","data_entrada","data_alta","data_retirada","data_receita"]);
 const COL_NSA = new Set(["aih","tipo_aih","aih_do_periodo","apac","co_principal_opm","qtd_conferida_sigtap","nota_conferencia","observacao_usuario","obs_regra","aviso","incremento_aplicado","nivel_preco","periodo_bps","base_fraca","municipio","forma_cobranca"]);
 const DATA_VAZIA = "0000-00-00", NAO_INFORMADO = "Não informado", NAO_SE_APLICA = "Não se aplica";
@@ -1957,7 +2010,9 @@ const DICIONARIO = [
   D("Medicamentos","codigo_catmat","Código CATMAT (000000 = sem correspondência).",T,DIGITADO),
   D("Medicamentos","medicamento","Descrição do item no CATMAT/BPS.",T,BPSF),
   D("Medicamentos","unidade","Unidade de fornecimento do preço.",T,DIGITADO),
-  D("Medicamentos","quantidade","Quantidade retirada, em unidades (não em caixas).",N,DIGITADO),
+  D("Medicamentos","quantidade","Quantidade retirada, na unidade de fornecimento (por exemplo, comprimidos); se veio de caixas, é nº de caixas × unidades por caixa.",N,DIGITADO),
+  D("Medicamentos","qtd_caixas","Nº de caixas informado quando o prontuário traz só caixas; a quantidade foi convertida em unidades. 0 quando a quantidade foi informada em unidades.",N,DIGITADO),
+  D("Medicamentos","un_por_caixa","Unidades por caixa usadas na conversão (embalagem, bula ou CMED). 0 quando não houve conversão.",N,DIGITADO),
   D("Medicamentos","uf","UF de retirada; define o nível de preço.",T,DIGITADO),
   D("Medicamentos","municipio","Município de retirada (opcional).",T,DIGITADO),
   D("Medicamentos","situacao","Situações padrão do registro.",L,DIGITADO,"N, AP, IA, AE, D, DP, DE, FI, NC, RP, SC, SS"),
@@ -2077,6 +2132,7 @@ $("#exp-baixar").addEventListener("click", () => {
               { chave: "celulas_vazias", valor: `texto: "${NAO_INFORMADO}" ou "${NAO_SE_APLICA}"; numérico: 0; data: ${DATA_VAZIA}` }, { chave: "versao_arquivo", valor: semPront ? "Sem prontuário" : "Completa" });
   add("Parâmetros", params, ["chave","valor"]);
   add("Dicionário", DICIONARIO.filter(d => !(semPront && d.variavel === "prontuario" && d.aba !== "Parâmetros")), ["aba","variavel","descricao","tipo","origem","valores_ou_regra"]);
+  atualizarNomeArquivo();
   XLSX.writeFile(wb, $("#exp-nome").textContent);
   toast("Planilha gerada.");
 });
@@ -2216,6 +2272,197 @@ $("#juntar-ok").addEventListener("click", async () => {
 });
 
 /* =====================================================================
+   FORMULÁRIOS: entrada anterior entre telas, datas coladas e avisos, edição
+   ===================================================================== */
+function chaveData(t){ const m = /^(\d\d)-(\d\d)-(\d{4}) (\d\d):(\d\d):(\d\d)$/.exec(t || ""); return m ? m[3] + m[2] + m[1] + m[4] + m[5] + m[6] : "0"; }
+const EQUIV = { data_realizacao: ["data_realizacao","data_retirada"], data_retirada: ["data_realizacao","data_retirada"], data_pedido: ["data_pedido","data_receita"], data_receita: ["data_pedido","data_receita"] };
+/* Última entrada registrada em qualquer uma das três telas que tenha o campo (datas equivalentes valem entre telas) */
+function ultimoCom(k){
+  const ks = EQUIV[k] || [k];
+  const L = [...state.procs, ...state.meds, ...state.ints].map((e, i) => ({ e, i })).filter(x => ks.some(c => c in x.e));
+  if (!L.length) return null;
+  L.sort((a, b) => chaveData(b.e.criado_em).localeCompare(chaveData(a.e.criado_em)) || b.i - a.i);
+  const e = L[0].e; return { e, v: e[ks.find(c => c in e)] };
+}
+
+/* Colar data: aceita DD/MM/AAAA, DD-MM-AAAA, DD.MM.AAAA e AAAA-MM-DD, com ou sem hora */
+function dataParaISO(t){
+  let d, m, a, r;
+  if ((r = /^(\d{1,2})[\/.\-](\d{1,2})[\/.\-](\d{4}|\d{2})(?:\D.*)?$/.exec(t))) { d = +r[1]; m = +r[2]; a = +r[3]; if (a < 100) a += 2000; }
+  else if ((r = /^(\d{4})[\/.\-](\d{1,2})[\/.\-](\d{1,2})(?:\D.*)?$/.exec(t))) { a = +r[1]; m = +r[2]; d = +r[3]; }
+  else return null;
+  const dt = new Date(Date.UTC(a, m - 1, d));
+  if (dt.getUTCFullYear() !== a || dt.getUTCMonth() !== m - 1 || dt.getUTCDate() !== d) return null;
+  return `${String(a).padStart(4, "0")}-${String(m).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+}
+document.addEventListener("paste", e => {
+  const el = e.target;
+  if (!(el instanceof HTMLInputElement) || el.type !== "date") return;
+  const txt = ((e.clipboardData || window.clipboardData)?.getData("text") || "").trim();
+  e.preventDefault();
+  const iso = dataParaISO(txt);
+  if (!iso) { toast("Não reconheci a data colada. Use DD/MM/AAAA.", true); return; }
+  el.value = iso;
+  el.dispatchEvent(new Event("input", { bubbles: true })); el.dispatchEvent(new Event("change", { bubbles: true }));
+});
+
+/* Avisos de data enquanto o usuário preenche (antes de salvar) */
+function avisarDatas(view){
+  const val = k => {
+    const el = $(`[data-k=${k}]`, view); if (!el) return "";
+    const f = el.closest(".f"); if (f && $$("input[data-unk]", f).some(c => c.checked)) return "";
+    const same = f && $("input[data-same-field]:checked", f);
+    return same ? val(same.dataset.sameField) : el.value;
+  };
+  const hj = hoje(), ok = d => /^\d{4}-\d{2}-\d{2}$/.test(d);
+  const regras = {
+    data_realizacao: [d => d > hj && "Data no futuro", d => ok(val("data_pedido")) && d < val("data_pedido") && "Realização anterior à data do pedido"],
+    data_pedido: [d => d > hj && "Data no futuro"],
+    data_retirada: [d => d > hj && "Data no futuro", d => ok(val("data_receita")) && d < val("data_receita") && "Retirada anterior à data da receita"],
+    data_receita: [d => d > hj && "Data no futuro"],
+    data_entrada: [d => d > hj && "Data no futuro"],
+    data_alta: [d => d > hj && "Data no futuro", d => ok(val("data_entrada")) && d < val("data_entrada") && "Alta anterior à entrada"],
+    rt_inicio: [d => d > hj && "Data no futuro"],
+    rt_fim: [d => d > hj && "Data no futuro", d => ok(val("rt_inicio")) && d < val("rt_inicio") && "Término anterior ao início"]
+  };
+  Object.entries(regras).forEach(([k, fs]) => {
+    const el = $(`[data-k=${k}]`, view); if (!el) return;
+    const f = el.closest(".f");
+    let w = $(".live-warn", f); if (!w) { w = document.createElement("div"); w.className = "live-warn hidden"; (el.nextElementSibling || el).after(w); }
+    const d = val(k), msgs = ok(d) ? fs.map(fn => fn(d)).filter(Boolean) : [];
+    w.textContent = msgs.length ? "⚠ " + msgs.join(" · ") : ""; w.classList.toggle("hidden", !msgs.length);
+  });
+}
+/* Origem "Outra", "mesma data da realização" e situação travada */
+function atualizarForm(view){
+  if (!view) return;
+  $$("select[data-k=origem_dado]", view).forEach(sel => { const h = $("[data-outra]", sel.closest(".f")); if (h) h.classList.toggle("hidden", sel.value !== "Outra"); });
+  $$("input[data-same-field]:checked", view).forEach(cb => { const campo = $("[data-k]", cb.closest(".f")), o = $(`[data-k=${cb.dataset.sameField}]`, view); if (campo && o) campo.value = o.value; });
+  avisarDatas(view);
+}
+document.addEventListener("input", e => { const v = e.target.closest?.(".view"); if (v && e.target.matches("[data-k]")) atualizarForm(v); });
+document.addEventListener("change", e => { const v = e.target.closest?.(".view"); if (v && e.target.matches("[data-k],[data-unk],[data-same-field]")) atualizarForm(v); });
+
+/* "Mesma situação da entrada anterior" */
+document.addEventListener("change", e => {
+  const cb = e.target.closest("input[data-sit-same]"); if (!cb) return;
+  const box = cb.closest(".f"), tags = $(".tags", box);
+  if (cb.checked) {
+    const u = ultimoCom("situacao");
+    if (!u) { toast("Ainda não há entrada anterior neste projeto."); cb.checked = false; return; }
+    const sel = new Set(Array.isArray(u.v) ? u.v : []);
+    $$(".tag", tags).forEach(t => t.classList.toggle("on", sel.has(t.dataset.s)));
+    tags.classList.add("locked");
+  } else tags.classList.remove("locked");
+});
+
+/* Sem prontuário: o código do paciente identifica o paciente */
+function fecharProntuario(e){
+  if (e.prontuario !== "Sem prontuário") return true;
+  if (!e.codigo_paciente || e.codigo_paciente === "Sem código") { toast("Paciente sem prontuário: informe o código do paciente.", true); return false; }
+  e.prontuario = `Sem prontuário (${e.codigo_paciente})`;
+  return true;
+}
+
+/* Medicamento: receita em caixas */
+const caixasCb = $("#med-caixas");
+function recalcCaixas(){
+  if (!caixasCb.checked) return;
+  const c = Number($("[data-k=qtd_caixas]").value) || 0, u = Number($("[data-k=un_por_caixa]").value) || 0, q = Math.round(c * u * 100) / 100;
+  $("#med-qtd").value = q > 0 ? q : "";
+  $("#med-caixas-res").textContent = q > 0 ? `${c} × ${u} = ${q} unidades` : "—";
+  atualizarPreco();
+}
+function aplicarCaixas(on){
+  caixasCb.checked = on;
+  $("#med-caixas-box").classList.toggle("hidden", !on);
+  $("#med-qtd").readOnly = on;
+  if (!on) { $("[data-k=qtd_caixas]").value = ""; $("[data-k=un_por_caixa]").value = ""; $("#med-caixas-res").textContent = "—"; }
+  recalcCaixas();
+}
+caixasCb.addEventListener("change", () => { aplicarCaixas(caixasCb.checked); if (!caixasCb.checked) { $("#med-qtd").value = 1; atualizarPreco(); } });
+$("#med-caixas-box").addEventListener("input", recalcCaixas);
+$("#med-un").addEventListener("change", () => $("#med-caixas-un").classList.toggle("hidden", !/CAIXA/i.test($("#med-un").value)));
+
+/* Limpar / terminar edição */
+let editando = null;
+function limparTudo(v, completo){
+  if (completo || editando) {
+    $$("input[data-lock]", v).forEach(c => { c.checked = !!c.defaultChecked; c.disabled = false; });
+    $$(".f", v).forEach(f => { if (f.querySelector("[data-lock]")) syncLocks(f); });
+    $$("input[data-sit-same]", v).forEach(c => { c.checked = false; $(".tags", c.closest(".f")).classList.remove("locked"); });
+    $$(".checks", v).forEach(syncGroup);
+  }
+  if (v.id === "v-medicamentos") aplicarCaixas(false);
+  limpar(v);
+  if (v.id === "v-procedimentos") { selProc = null; procBusca.value = ""; procBusca.dataset.escolhido = ""; renderProcInfo(); atualizarLocal(); ssAuto = false; $("#proc-ss-aviso").classList.add("hidden"); }
+  if (v.id === "v-medicamentos") { selMed = null; medBusca.value = ""; medBusca.dataset.escolhido = ""; renderMedInfo(); }
+  encerrarEdicao(v);
+}
+const BOTAO_SALVAR = { "v-procedimentos": ["#proc-salvar", "Salvar e próximo"], "v-internacoes": ["#int-salvar", "Salvar internação"], "v-medicamentos": ["#med-salvar", "Salvar e próximo"] };
+function encerrarEdicao(v){
+  editando = null;
+  const b = BOTAO_SALVAR[v.id]; if (b) $(b[0]).textContent = b[1];
+  $(".edit-banner", v)?.remove();
+}
+function iniciarEdicao(v, lista, rec){
+  editando = { lista, id: rec.id };
+  const b = BOTAO_SALVAR[v.id]; $(b[0]).textContent = "Salvar alterações";
+  $(".edit-banner", v)?.remove();
+  const ban = document.createElement("div"); ban.className = "info edit-banner";
+  const t = document.createElement("span"); t.textContent = `✎ Editando uma entrada já salva (${rec.prontuario || ""}). Ao salvar, ela é substituída e o projeto é recalculado.`;
+  const c = document.createElement("button"); c.className = "btn sm"; c.textContent = "Cancelar edição"; c.addEventListener("click", () => limparTudo(v, true));
+  ban.append(t, c); $(".subnav", v).after(ban);
+}
+async function editarEntrada(lista, id){
+  const rec = state[lista].find(x => x.id === id); if (!rec) return;
+  const vid = { procs: "procedimentos", meds: "medicamentos", ints: "internacoes" }[lista], v = document.getElementById("v-" + vid);
+  show(vid);
+  editando = null; limparTudo(v, true);
+  if (lista === "procs") {
+    const it = DB.sigtap[compAtual()]?.byCode.get(rec.co_procedimento);
+    if (it) escolherProc(it, true); else toast(`O código ${fmtCod(rec.co_procedimento)} não existe em ${compAtual()}. Escolha outro procedimento.`, true);
+  }
+  if (lista === "meds") {
+    const it = DB.bps[bpsAtual()]?.byCat.get(rec.codigo_catmat);
+    if (it) escolherMed(it); else toast(`O CATMAT ${rec.codigo_catmat} não existe na base BPS ${bpsAtual()}. Escolha outro medicamento.`, true);
+  }
+  preencher(v, rec);
+  /* caixinhas "desconhecida / não necessário / sem prontuário" */
+  $$("input[data-unk]", v).forEach(c => {
+    const f = c.closest(".f"), campo = $("[data-k]", f); if (!campo) return;
+    const val = String(rec[campo.dataset.k] ?? "");
+    if (val === c.dataset.unk || (c.dataset.unk === "Sem prontuário" && val.startsWith("Sem prontuário ("))) { c.checked = true; syncLocks(f); if (val !== c.dataset.unk) campo.value = ""; else campo.value = ""; }
+    else if (c.dataset.unk === "Não necessário") { c.checked = false; syncLocks(f); }
+  });
+  $$(".checks", v).forEach(syncGroup);
+  $$(".tag", v).forEach(t => t.classList.toggle("on", Array.isArray(rec.situacao) && rec.situacao.includes(t.dataset.s)));
+  if (lista === "meds") {
+    $("#med-un").value = rec.unidade || $("#med-un").value;
+    if (Number(rec.qtd_caixas) > 0) { aplicarCaixas(true); $("[data-k=qtd_caixas]").value = rec.qtd_caixas; $("[data-k=un_por_caixa]").value = rec.un_por_caixa; recalcCaixas(); }
+    $("#med-caixas-un").classList.toggle("hidden", !/CAIXA/i.test($("#med-un").value));
+    atualizarPreco();
+  }
+  if (lista === "procs") atualizarLocal();
+  atualizarForm(v);
+  iniciarEdicao(v, lista, rec);
+  window.scrollTo(0, 0);
+}
+document.addEventListener("click", e => { const b = e.target.closest("[data-edit]"); if (!b) return; const [lista, id] = b.dataset.edit.split(":"); editarEntrada(lista, id); });
+
+/* Nome do arquivo: data da última entrada _ projeto _ data da exportação _ versão */
+function atualizarNomeArquivo(){
+  const p = state.projeto;
+  const slug = norm(p?.titulo || "titulo-do-projeto").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "projeto";
+  const versao = $("#exp-versao .on")?.textContent.trim() === "Sem prontuário" ? "sem-prontuario" : "completa";
+  const ks = [...state.procs, ...state.meds, ...state.ints].map(e => chaveData(e.criado_em)).filter(k => k !== "0").sort();
+  const u = ks.length ? ks[ks.length - 1] : "";
+  const ultima = u ? `${u.slice(0, 4)}-${u.slice(4, 6)}-${u.slice(6, 8)}` : hoje();
+  $("#exp-nome").textContent = `${ultima}_${slug}_${hoje()}_${versao}.xlsx`;
+}
+$("#exp-versao").addEventListener("click", () => setTimeout(atualizarNomeArquivo, 0));
+
+/* =====================================================================
    NAVEGAÇÃO E INTERAÇÕES GERAIS
    ===================================================================== */
 document.querySelectorAll("[data-sub]").forEach(el => {
@@ -2252,7 +2499,7 @@ document.addEventListener("click", e => {
   }
 
   const tag = e.target.closest(".tag");
-  if (tag) { tag.classList.toggle("on"); return; }
+  if (tag) { if (!tag.closest(".tags.locked")) tag.classList.toggle("on"); return; }
 
   if (e.target.closest("[data-pick=abrir]")) { abrirFile.click(); return; }
   if (e.target.closest("[data-pick=juntar]")) { juntarFile.click(); return; }
@@ -2267,14 +2514,7 @@ document.addEventListener("click", e => {
   }
 
   const lim = e.target.closest("[data-limpar]");
-  if (lim) {
-    const v = lim.closest(".view");
-    $$("input[data-lock]", v).forEach(c => { c.checked = !!c.defaultChecked; c.disabled = false; });
-    $$(".f", v).forEach(f => { if (f.querySelector("[data-lock]")) syncLocks(f); });
-    limpar(v);
-    if (v.id === "v-procedimentos") { selProc = null; procBusca.value = ""; procBusca.dataset.escolhido = ""; renderProcInfo(); atualizarLocal(); }
-    if (v.id === "v-medicamentos") { selMed = null; medBusca.value = ""; medBusca.dataset.escolhido = ""; renderMedInfo(); }
-  }
+  if (lim) limparTudo(lim.closest(".view"), true);
 });
 
 /* Caixinhas "mesmo… / desconhecida / não necessário" travam o campo do bloco */
