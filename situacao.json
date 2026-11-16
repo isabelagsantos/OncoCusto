@@ -44,14 +44,14 @@
   {
     "sigla": "DE",
     "nome": "Duplicado nos exames",
-    "descricao": "Exame feito e registrado duas vezes nos exames. Custo normal em todas as linhas.",
-    "efeito": "normal",
+    "descricao": "Exame feito e registrado duas vezes nos exames.",
+    "efeito": "dobrado",
     "precedencia": 4
   },
   {
     "sigla": "FI",
     "nome": "Fora da instituição",
-    "descricao": "Feito em outro serviço.",
+    "descricao": "Feito em outro serviço e não pago pela instituição que fez o pedido. Ex.: a paciente chega com a mamografia já feita e entrega as imagens ou o laudo (marque FI). Não marque FI quando a instituição manda o exame para fora e paga por ele (ex.: IHQ e anatomopatológico em laboratório externo).",
     "efeito": "normal",
     "precedencia": 99
   },
@@ -80,6 +80,20 @@
     "sigla": "SS",
     "nome": "Sem SIGTAP no prontuário",
     "descricao": "Nos exames e no prontuário, sem código SIGTAP.",
+    "efeito": "normal",
+    "precedencia": 99
+  },
+  {
+    "sigla": "CP",
+    "nome": "Consultar profissional competente",
+    "descricao": "Registro que precisa ser conferido com um profissional da área. A observação livre passa a ser obrigatória.",
+    "efeito": "normal",
+    "precedencia": 99
+  },
+  {
+    "sigla": "CI",
+    "nome": "Cálculo por inferência",
+    "descricao": "Quantidade de comprimidos (ou outra unidade) calculada a partir das caixas informadas na receita. Marcada sozinha em Medicamentos.",
     "efeito": "normal",
     "precedencia": 99
   }

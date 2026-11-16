@@ -1,8 +1,8 @@
 # OncoCusto
 
-**Custos de pacientes com câncer pela tabela SIGTAP, na perspectiva do SUS.**
+**Custos de pacientes com câncer na perspectiva do SUS.**
 
-O OncoCusto transforma o registro assistencial (procedimentos, internações e medicamentos do prontuário) no **valor que o SUS paga pela tabela SIGTAP** e no preço dos medicamentos pelo **Banco de Preços em Saúde (BPS)**. O resultado sai numa planilha .xlsx por projeto, com avisos de conferência e os parâmetros usados.
+O OncoCusto transforma o registro assistencial (procedimentos, internações e medicamentos do prontuário) no **valor que o SUS paga**: procedimentos pela tabela SIGTAP e medicamentos pelo **Banco de Preços em Saúde (BPS)**. O resultado sai numa planilha .xlsx por projeto, com avisos de conferência e os parâmetros usados.
 
 É uma página estática, publicada no GitHub Pages. Não precisa instalar nada nem criar conta.
 
@@ -34,11 +34,14 @@ Para conferir: abra as ferramentas do desenvolvedor (F12) › aba *Rede* e regis
 ## Como usar
 
 1. **Projeto:** identificação do estudo, usuário da sessão e decisões metodológicas (competência do SIGTAP, base do BPS, mínimo de compras, habilitação 17.17/17.18 etc.).
-2. **Internações:** uma linha por AIH, com entrada e alta. As datas definem o local do ato (ambulatorial ou hospitalar).
-3. **Procedimentos:** exames, consultas, cirurgias, quimioterapia, radioterapia, diárias e OPM, com conferência de OPM contra a cirurgia e as regras de custeio (APAC mensal, secundários, radioterapia, AIH sequenciais, incremento de 20%, situações). Códigos sem correspondência: 00.00.00.000-0 (procedimento) e 000000 (medicamento).
-4. **Medicamentos:** retiradas fora de procedimentos, com a mediana do BPS (município → UF → região → Brasil; mínimo de 3 compras, plano B de 1 compra marcado como "base fraca").
-5. **Revisão:** todas as entradas, filtros e avisos pendentes.
-6. **Exportar:** planilha completa ou **sem prontuário** (para compartilhar). Células vazias saem como "Não informado"/"Não se aplica" (texto), 0 (número) ou 0000-00-00 (data); datas e horas de criação e exportação seguem o horário de Brasília (DD-MM-AAAA HH:MM:SS).
+2. **Internações:** uma linha por AIH, com entrada e alta. As datas definem o local do ato (ambulatorial ou hospitalar). O site avisa quando duas AIH do mesmo paciente têm períodos que se cruzam.
+3. **Procedimentos:** exames, consultas, cirurgias, quimioterapia, radioterapia, diárias e OPM, com conferência de OPM contra a cirurgia e as regras de custeio (APAC mensal, secundários, radioterapia, AIH sequenciais, incremento de 20%, situações). Códigos sem correspondência: 00.00.00.000-0 (procedimento) e 000000 (medicamento). A data de realização pode ficar como "Preencher posteriormente" (a entrada fica com aviso até ser editada). Mamografia, ultrassonografia mamária e ressonância da mama têm o campo BI-RADS.
+4. **Medicamentos:** retiradas fora de procedimentos, com a mediana do BPS (município → UF → região → Brasil; mínimo de 3 compras, plano B de 1 compra marcado como "base fraca"). Receita em caixas: o site converte em unidades e marca a situação CI (cálculo por inferência).
+5. **Revisão:** uma aba para Procedimentos, Internações e Medicamentos; linhas em cinza contam o que as outras abas têm na mesma data (ou no período da internação). Filtros por paciente, mês, mês do pedido/receita, AIH, situação e avisos, ordem por data, e totais que seguem os filtros. Os filtros ficam guardados no navegador.
+6. **Exportar:** planilha completa ou **sem prontuário** (para compartilhar). Nome do arquivo: `data-da-exportação_titulo-do-projeto_data-da-última-entrada_completa|sem-prontuario.xlsx` (datas em AAAA-MM-DD; a última entrada considera procedimentos, internações e medicamentos). Células vazias saem como "Não informado"/"Não se aplica" (texto), 0 (número) ou 0000-00-00 (data); datas e horas de criação e exportação seguem o horário de Brasília (DD-MM-AAAA HH:MM:SS).
+
+Regras de registro: prontuário e código do paciente são obrigatórios (ou marque que não existem; paciente sem prontuário fica identificado só pelo código). Cada entrada tem uma só situação (sem escolha vale N); a situação CP (consultar profissional competente) torna a observação livre obrigatória. O site pede confirmação ao salvar uma entrada com os mesmos dados de outra (possível duplicidade).
+
 7. **Ajuda:** conferência no SIGTAP, o que é o id da planilha, limitações e contato.
 
 A planilha exportada tem as abas Procedimentos, Internações, Medicamentos, Resumo, Avisos, Limitações, Parâmetros e Dicionário (significado, tipo, origem e regra de cada variável de cada aba), e pode ser reaberta no site para continuar o projeto em outro computador.
